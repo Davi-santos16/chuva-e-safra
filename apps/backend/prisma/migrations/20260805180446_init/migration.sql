@@ -5,7 +5,7 @@ CREATE TYPE "UserRole" AS ENUM ('PRODUTOR', 'TECNICO_COOPERATIVA', 'GESTOR_PUBLI
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
+    "email" TEXT NOT NULL UNIQUE,
     "password" TEXT NOT NULL,
     "role" "UserRole" NOT NULL,
     "municipio" TEXT,
