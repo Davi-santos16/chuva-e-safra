@@ -2,6 +2,7 @@
 
 import { AppError } from "@/utils/AppError";
 import { Response, Request, NextFunction } from "express";
+import { z } from 'zod';
 
 
 export function errorHandling(
@@ -10,6 +11,14 @@ export function errorHandling(
   response: Response,
   next: NextFunction,
 ) {
+  if (error instanceof z.ZodError) {
+    const errors = error.issues.map(issue => issue.message);
+
+    return response.status(400).json({
+      message: errors
+    });
+  }
+  
   if (error instanceof AppError) {
     return response.status(error.statusCode).json({ message: error.message });
   }
