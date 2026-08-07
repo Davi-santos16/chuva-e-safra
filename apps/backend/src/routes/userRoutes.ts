@@ -7,6 +7,6 @@ const UserRouter = Router();
 const userController = new UserController();
 
 //UserRouter.get("/", userController.index);
-UserRouter.post("/create", checkInputsUser, userController.create);
+UserRouter.post("/register", checkInputsUser, userController.create);
 
 export { UserRouter };
