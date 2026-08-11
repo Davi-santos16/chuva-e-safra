@@ -77,10 +77,16 @@ Crie o arquivo `apps/backend/.env` com as conexões fornecidas pelo Supabase:
 ```env
 DATABASE_URL="postgresql://...URL-do-pooler-do-Supabase..."
 DIRECT_URL="postgresql://...URL-direta-do-Supabase..."
+API_DADOS_URL="https://...URL-da-API-de-dados..."
+JWT_SECRET="...chave-longa-e-aleatoria..."
+JWT_EXPIRES_IN="1d"
 ```
 
 - `DATABASE_URL` é usada pela aplicação e deve apontar para a conexão com pool do Supabase.
 - `DIRECT_URL` é usada pelos comandos do Prisma e deve apontar para a conexão direta (ou para o Session Pooler) do Supabase.
+- `API_DADOS_URL` é a URL base da API externa de análises.
+- `JWT_SECRET` assina e valida os tokens de autenticação e deve ser mantida em segredo.
+- `JWT_EXPIRES_IN` define a validade do token; quando omitida, a aplicação usa `1d`.
 - Não envie o arquivo `.env` para o repositório.
 
 Com as variáveis configuradas, gere o Prisma Client:
@@ -120,6 +126,17 @@ Também é possível iniciar cada parte separadamente, sempre pela raiz:
 npm run dev:frontend
 npm run dev:backend
 ```
+
+## Documentação da API
+
+Com o backend em execução, a documentação interativa Swagger fica disponível em:
+
+- Swagger UI: `http://localhost:3333/docs`
+- Especificação OpenAPI em JSON: `http://localhost:3333/docs.json`
+
+Na interface Swagger, cadastre um usuário, faça login, copie o token retornado e
+use o botão **Authorize** para testar a rota protegida de análises. Informe apenas
+o token; o prefixo `Bearer` é adicionado automaticamente.
 
 ## Como o projeto funciona
 
