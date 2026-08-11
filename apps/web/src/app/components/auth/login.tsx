@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RequestAccessButton } from '@/app/components/landing/RequestAccessButton'
+import { getLoginErrorMessage, login } from '@/services/auth'
 
 export const Login = () => {
   const router = useRouter()
@@ -17,17 +18,28 @@ export const Login = () => {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!email.trim() || !password.trim()) {
-      setMessage('Preencha e-mail ou CPF e senha para continuar no protótipo.')
+      setError('Preencha e-mail e senha para continuar.')
       return
     }
-    setMessage('Acesso demonstrativo autorizado. Preparando seu painel…')
+
+    setError('')
     setLoading(true)
-    window.setTimeout(() => router.push('/produtor/dashboard'), 850)
+
+    try {
+      const { token } = await login({ email: email.trim(), password })
+
+      localStorage.setItem('authToken', token)
+      router.push('/produtor/dashboard')
+    } catch (error) {
+      setError(getLoginErrorMessage(error))
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -55,7 +67,7 @@ export const Login = () => {
               <div><Label htmlFor='login-identifier' className='font-semibold'>E-mail ou CPF</Label><Input id='login-identifier' value={email} onChange={(event) => setEmail(event.target.value)} placeholder='danileilaleila@gmail.com' className='mt-2' autoComplete='username' required /></div>
               <div className='mt-5'><Label htmlFor='login-password' className='font-semibold'>Senha</Label><div className='relative mt-2'><Input id='login-password' value={password} onChange={(event) => setPassword(event.target.value)} placeholder='Digite sua senha' type={showPassword ? 'text' : 'password'} className='pr-12' autoComplete='current-password' required /><button type='button' onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'} className='absolute right-0 top-0 flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground hover:text-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'><Icon icon={showPassword ? 'tabler:eye-off' : 'tabler:eye'} width={19} aria-hidden='true' /></button></div></div>
 
-              <p role='status' aria-live='polite' className={`mt-4 min-h-5 text-sm ${message.startsWith('Preencha') ? 'text-destructive' : 'text-muted-foreground'}`}>{message}</p>
+              <p role={error ? 'alert' : 'status'} aria-live='polite' className={`mt-4 min-h-5 text-sm ${error ? 'text-destructive' : 'text-muted-foreground'}`}>{error}</p>
               <Button type='submit' className='mt-2 h-12 w-full text-base' disabled={loading}>{loading ? <><Icon icon='tabler:loader-2' className='animate-spin motion-reduce:animate-none' width={19} aria-hidden='true' />Entrando…</> : 'Entrar'}</Button>
             </form>
 
