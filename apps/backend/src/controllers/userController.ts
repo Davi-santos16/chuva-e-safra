@@ -29,13 +29,14 @@ export class UserController {
             const hashedPassword = await bcrypt.hash(data.password, 10);
 
             // CRIAR O USER
-            const user = await prisma.user.create({
+            await prisma.user.create({
                 data: {
                     name: data.name,
                     email: data.email,
                     password: hashedPassword,
                     role: data.role,
-                    municipio: data.municipio,
+                    municipio: data.role === 'PRODUTOR' ? data.municipio : null,
+                    uf: data.role === 'GESTOR_PUBLICO' ? 'CE' : null,
                 }
             });
 
