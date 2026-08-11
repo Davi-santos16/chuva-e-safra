@@ -44,7 +44,7 @@ const page = () => {
       profileImg: "/images/profile/user-6.jpg",
       username: "Nirav Joshi",
       designation: "Web Manager",
-      project: "Material Pro",
+      project: "Material",
       priority: "High",
       color: "warning",
       budget: "12.8k"

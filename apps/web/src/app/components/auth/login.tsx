@@ -18,31 +18,31 @@ export const Login = () => {
               <FullLogo />
             </div>
             <p className='text-sm text-charcoal text-center mb-6'>
-              Your Social Campaigns
+              Acesse sua conta
             </p>
             <div>
               <div className='mb-2 block'>
                 <Label htmlFor='username1' className='font-medium'>
-                  Username
+                  E-mail
                 </Label>
               </div>
               <Input
                 id='username1'
                 type='text'
-                placeholder='Enter your username'
+                placeholder='Digite seu e-mail'
                 required
               />
             </div>
             <div className='mt-6'>
               <div className='mb-2 block'>
                 <Label htmlFor='password1' className='font-medium'>
-                  Password
+                  Senha
                 </Label>
               </div>
               <Input
                 id='password1'
                 type='password'
-                placeholder='Enter your password'
+                placeholder='Digite sua senha'
                 required
               />
             </div>
@@ -52,26 +52,26 @@ export const Login = () => {
                 <Label
                   className='text-link font-normal text-sm'
                   htmlFor='remember'>
-                  Remember this device
+                  Lembrar neste dispositivo
                 </Label>
               </div>
               <Link
                 href='#'
                 className='text-sm font-medium text-primary hover:text-primaryemphasis'>
-                Forgot Password ?
+                Esqueceu a senha?
               </Link>
             </div>
             <Button className='w-full' asChild>
-              <Link href='/'>Sign In</Link>
+              <Link href='/'>Entrar</Link>
             </Button>
             <div className='flex items center gap-2 justify-center mt-6 flex-wrap'>
               <p className='text-base font-medium text-link dark:text-darklink'>
-                New to Modernize?
+                Ainda não tem conta?
               </p>
               <Link
                 href='/auth/register'
                 className='text-sm font-medium text-primary hover:text-primaryemphasis'>
-                Create an account
+                Criar conta
               </Link>
             </div>
           </CardBox>
