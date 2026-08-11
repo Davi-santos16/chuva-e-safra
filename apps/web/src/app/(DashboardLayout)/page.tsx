@@ -5,8 +5,6 @@ import { YearlyBreakup } from "../components/dashboard/YearlyBreakup";
 import { MonthlyEarning } from "../components/dashboard/MonthlyEarning";
 import { RecentTransaction } from "../components/dashboard/RecentTransaction";
 import { ProductPerformance } from "../components/dashboard/ProductPerformance";
-import { Footer } from "../components/dashboard/Footer";
-import { BestSeller } from "../components/dashboard/BestSeller";
 
 const page = () => {
   return (
@@ -30,12 +28,6 @@ const page = () => {
         </div>
         <div className="lg:col-span-8 col-span-12 flex">
           <ProductPerformance />
-        </div>
-        <div className="col-span-12">
-          <BestSeller />
-        </div>
-        <div className="col-span-12">
-          <Footer />
         </div>
       </div>
     </>

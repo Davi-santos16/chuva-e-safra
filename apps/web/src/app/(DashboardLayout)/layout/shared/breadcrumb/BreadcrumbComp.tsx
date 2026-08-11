@@ -1,8 +1,9 @@
 'use client'
 
 import CardBox from '@/app/components/shared/CardBox'
-import Image from 'next/image'
+import { IconChevronRight } from '@tabler/icons-react'
 import { JSX } from 'react'
+import FullLogo from '../logo/FullLogo'
 
 interface BreadCrumbType {
   subtitle?: string
@@ -15,40 +16,39 @@ const BreadcrumbComp = ({ items, title }: BreadCrumbType) => {
   return (
     <>
       <CardBox
-        className={`mb-6 py-4 bg-lightsecondary dark:bg-darkinfo overflow-hidden rounded-md border-none !shadow-none dark:!shadow-none`}>
-        <div className=' items-center grid grid-cols-12 gap-6'>
-          <div className='col-span-10'>
-            <h4 className='font-semibold text-xl text-customdark mb-3'>
+        className='mb-6 overflow-hidden bg-secondary py-4 !rounded-2xl !border-border !shadow-none'>
+        <div className='grid grid-cols-12 items-center gap-4 md:gap-6'>
+          <div className='col-span-12 sm:col-span-9'>
+            <h4 className='mb-2 text-xl font-semibold text-foreground'>
               {title}
             </h4>
             <ol
-              className='flex items-center whitespace-nowrap'
+              className='flex flex-wrap items-center'
               aria-label='Breadcrumb'>
               <li className='flex items-center'>
                 <a
-                  className='opacity-80 text-sm text-charcoal leading-none'
+                  className='rounded-sm text-sm leading-none text-muted-foreground transition-colors hover:text-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                   href='@@webRoot/main/index.html'>
                   Home
                 </a>
               </li>
-              <li>
-                <div className='p-0.5 rounded-full bg-dark dark:bg-darklink mx-2.5 flex items-center'></div>
+              <li aria-hidden='true' className='mx-2 flex items-center'>
+                <IconChevronRight
+                  size={16}
+                  className='text-muted-foreground'
+                />
               </li>
               <li
-                className='flex items-center text-sm text-charcoal leading-none'
+                className='flex items-center text-sm font-medium leading-none text-foreground'
                 aria-current='page'>
                 {title}
               </li>
             </ol>
           </div>
-          <div className='col-span-2 flex justify-center -mb-10'>
-            <Image
-              src={'/images/breadcrumb/ChatBc.png'}
-              alt=''
-              className='md:-mb-[31px] -mb-4'
-              width={140}
-              height={150}
-            />
+          <div
+            aria-hidden='true'
+            className='col-span-3 hidden justify-center sm:flex'>
+            <FullLogo compact className='w-20 md:w-24' />
           </div>
         </div>
       </CardBox>

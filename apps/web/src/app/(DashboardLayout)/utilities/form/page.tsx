@@ -57,7 +57,7 @@ const Page = () => {
       <div className="grid gap-6 grid-cols-1 xl:grid-cols-2">
         <div className="flex flex-col gap-6">
           {/* Default Inputs */}
-          <div className="rounded-sm border border-defaultBorder md:p-6 p-4">
+          <div className="rounded-lg border border-border bg-card md:p-6 p-4">
             <h5 className="card-title">Default Inputs</h5>
             <div className="mt-6 flex flex-col gap-6">
               {/* Basic Input */}
@@ -116,7 +116,7 @@ const Page = () => {
                     <Button
                       variant="outline"
                       id="date"
-                      className="w-full justify-between font-normal hover:bg-transparent focus:border-primary"
+                      className="w-full justify-between font-normal hover:bg-transparent focus:border-ring"
                     >
                       {date ? date.toLocaleDateString() : "Select date"}
                       <Icon icon="solar:calendar-minimalistic-linear" width={18} height={18} />
@@ -150,7 +150,7 @@ const Page = () => {
                     required
                     className="pr-10 [&::-webkit-calendar-picker-indicator]:hidden"
                   />
-                  <Icon icon="solar:clock-circle-linear" width="18" height="18" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                  <Icon icon="solar:clock-circle-linear" width="18" height="18" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" aria-hidden="true" />
                 </div>
               </div>
 
@@ -162,7 +162,8 @@ const Page = () => {
                     icon="uim:master-card"
                     width="20"
                     height="20"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    aria-hidden="true"
                   />
                   <Input id="card" type="text" placeholder="Card number" className="pl-10" />
                 </div>
@@ -171,7 +172,7 @@ const Page = () => {
           </div>
 
           {/* Textarea */}
-          <div className="rounded-sm border border-defaultBorder md:p-6 p-4">
+          <div className="rounded-lg border border-border bg-card md:p-6 p-4">
             <h5 className="card-title">Textarea Input</h5>
             <div className="mt-6 flex flex-col gap-6">
               <div>
@@ -185,19 +186,20 @@ const Page = () => {
               </div>
 
               <div>
-                <Label htmlFor="error-comment" className="text-red-600">Description</Label>
+                <Label htmlFor="error-comment" className="text-destructive">Description</Label>
                 <Textarea
                   id="error-comment"
                   placeholder="Leave a comment..."
                   rows={4}
-                  className="border-red-600 text-red-600 focus-visible:border-red-600"
+                  className="border-destructive text-destructive focus-visible:border-destructive"
+                  aria-invalid="true"
                 />
               </div>
             </div>
           </div>
 
           {/* Input Colors */}
-          <div className="rounded-sm border border-defaultBorder md:p-6 p-4">
+          <div className="rounded-lg border border-border bg-card md:p-6 p-4">
             <h5 className="card-title">Input Colors</h5>
             <div className="mt-6 flex flex-col gap-6">
               <div>
@@ -225,7 +227,7 @@ const Page = () => {
         {/* Right side */}
         <div className="flex flex-col gap-6">
           {/* Input Group with Icons */}
-          <div className="rounded-sm border border-defaultBorder md:p-6 p-4">
+          <div className="rounded-lg border border-border bg-card md:p-6 p-4">
             <h5 className="card-title">Input Group</h5>
             <div className="mt-6 flex flex-col gap-6">
               <div className="relative">
@@ -257,82 +259,84 @@ const Page = () => {
                     value={website}
                     onChange={(e) => setWebsite(e.target.value)}
                   />
-                  <button
+                  <Button
+                    type="button"
+                    variant="secondary"
                     onClick={handleCopy}
-                    className="px-3 py-2 text-sm rounded-md border border-ld bg-primary/10 dark:bg-primary/10 text-primary hover:bg-gray-200"
+                    className="rounded-md"
                   >
                     {copied ? "Copied" : "Copy"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
 
           {/* File Input */}
-          <div className="rounded-sm border border-defaultBorder md:p-6 p-4">
+          <div className="rounded-lg border border-border bg-card md:p-6 p-4">
             <h5 className="card-title">File Input</h5>
             <Input type="file" className="mt-6" />
           </div>
 
           {/* Checkbox */}
-          <div className="rounded-sm border border-defaultBorder md:p-6 p-4">
+          <div className="rounded-lg border border-border bg-card md:p-6 p-4">
             <h5 className="card-title">Checkbox</h5>
             <div className="flex gap-6 mt-6">
               <div className="flex items-center gap-2">
-                <Checkbox id="default" />
-                <Label htmlFor="default">Default</Label>
+                <Checkbox id="checkbox-default" />
+                <Label htmlFor="checkbox-default">Default</Label>
               </div>
               <div className="flex items-center gap-2">
-                <Checkbox id="checked" defaultChecked />
-                <Label htmlFor="checked">Checked</Label>
+                <Checkbox id="checkbox-checked" defaultChecked />
+                <Label htmlFor="checkbox-checked">Checked</Label>
               </div>
               <div className="flex items-center gap-2">
-                <Checkbox id="disabled" disabled />
-                <Label htmlFor="disabled">Disabled</Label>
+                <Checkbox id="checkbox-disabled" disabled />
+                <Label htmlFor="checkbox-disabled">Disabled</Label>
               </div>
             </div>
           </div>
 
           {/* Radio */}
-          <div className="rounded-sm border border-defaultBorder md:p-6 p-4">
+          <div className="rounded-lg border border-border bg-card md:p-6 p-4">
             <h5 className="card-title">Radio Buttons</h5>
             <RadioGroup defaultValue="default" className="mt-6 flex gap-6">
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="default" id="default" />
-                <Label htmlFor="default">Default</Label>
+                <RadioGroupItem value="default" id="radio-default" />
+                <Label htmlFor="radio-default">Default</Label>
               </div>
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="selected" id="selected" />
-                <Label htmlFor="selected">Selected</Label>
+                <RadioGroupItem value="selected" id="radio-selected" />
+                <Label htmlFor="radio-selected">Selected</Label>
               </div>
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="disabled" id="disabled" disabled />
-                <Label htmlFor="disabled">Disabled</Label>
+                <RadioGroupItem value="disabled" id="radio-disabled" disabled />
+                <Label htmlFor="radio-disabled">Disabled</Label>
               </div>
             </RadioGroup>
           </div>
 
           {/* Switch */}
-          <div className="rounded-sm border border-defaultBorder md:p-6 p-4">
+          <div className="rounded-lg border border-border bg-card md:p-6 p-4">
             <h5 className="card-title">Toggle Switch</h5>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-6">
               <div className="flex items-center gap-2">
-                <Switch checked={switch1} onCheckedChange={setSwitch1} />
-                <Label>Toggle me</Label>
+                <Switch id="switch-default" checked={switch1} onCheckedChange={setSwitch1} />
+                <Label htmlFor="switch-default">Toggle me</Label>
               </div>
               <div className="flex items-center gap-2">
-                <Switch checked={switch2} onCheckedChange={setSwitch2} />
-                <Label>Toggle me (checked)</Label>
+                <Switch id="switch-checked" checked={switch2} onCheckedChange={setSwitch2} />
+                <Label htmlFor="switch-checked">Toggle me (checked)</Label>
               </div>
               <div className="flex items-center gap-2">
-                <Switch disabled />
-                <Label>Disabled</Label>
+                <Switch id="switch-disabled" disabled />
+                <Label htmlFor="switch-disabled">Disabled</Label>
               </div>
               <div className="flex items-center gap-2">
-                <Switch checked disabled />
-                <Label>Disabled (checked)</Label>
+                <Switch id="switch-disabled-checked" checked disabled />
+                <Label htmlFor="switch-disabled-checked">Disabled (checked)</Label>
               </div>
-              <Switch checked={switch3} onCheckedChange={setSwitch3} />
+              <Switch checked={switch3} onCheckedChange={setSwitch3} aria-label="Toggle" />
             </div>
           </div>
         </div>

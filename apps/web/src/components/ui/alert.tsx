@@ -4,25 +4,25 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const alertVariants = cva(
-  "relative w-full rounded-lg  p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
+  "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-current",
   {
     variants: {
       variant: {
-        default: "bg-background text-foreground",
-        primary: "bg-primary text-white",
-        secondary:"bg-secondary text-white",
-        success:"bg-success text-white",
-        error:"bg-error text-white",
-        warning:"bg-warning text-white",
-        info:"bg-info text-white",
-        lightprimary:"bg-lightprimary text-primary [&>svg]:text-primary",
-        lightsecondary:"bg-lightsecondary text-secondary [&>svg]:text-secondary",
-        lightsuccess:"bg-lightsuccess text-success [&>svg]:text-success",
-        lightwarning:"bg-lightwarning text-warning [&>svg]:text-warning",
-        lighterror:"bg-lighterror text-error [&>svg]:text-error",
-        lightinfo:"bg-lightinfo text-info [&>svg]:text-info",
+        default: "border-border bg-card text-card-foreground",
+        primary: "border-primary bg-primary text-primary-foreground",
+        secondary: "border-secondary-foreground/20 bg-secondary text-secondary-foreground",
+        success: "border-success bg-success text-success-foreground",
+        error: "border-destructive bg-destructive text-destructive-foreground",
+        warning: "border-warning bg-warning text-warning-foreground",
+        info: "border-info bg-info text-info-foreground",
+        lightprimary: "border-interactive/20 bg-secondary text-foreground [&>svg]:text-interactive",
+        lightsecondary: "border-secondary-foreground/20 bg-secondary text-secondary-foreground",
+        lightsuccess: "border-success/30 bg-success-soft text-foreground [&>svg]:text-success",
+        lightwarning: "border-warning/30 bg-warning-soft text-foreground [&>svg]:text-warning",
+        lighterror: "border-destructive/30 bg-destructive-soft text-foreground [&>svg]:text-destructive",
+        lightinfo: "border-info/20 bg-info-soft text-foreground [&>svg]:text-info",
         destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+          "border-destructive/50 bg-destructive-soft text-foreground [&>svg]:text-destructive",
       },
     },
     defaultVariants: {

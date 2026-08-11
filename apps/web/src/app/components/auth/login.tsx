@@ -10,19 +10,18 @@ import { Input } from '@/components/ui/input'
 
 export const Login = () => {
   return (
-    <>
-      <div className='h-screen w-full flex justify-center items-center bg-lightprimary'>
-        <div className='md:min-w-[450px] min-w-max'>
-          <CardBox className='gap-0'>
+    <main className='flex min-h-dvh w-full items-center justify-center bg-background px-4 py-8 sm:px-6'>
+      <section className='w-full max-w-[450px]' aria-label='Acesso à conta'>
+        <CardBox className='gap-0 !rounded-2xl !border-border'>
             <div className='flex justify-center mb-4'>
-              <FullLogo />
+              <FullLogo priority className='w-[200px] max-w-full' />
             </div>
-            <p className='text-sm text-charcoal text-center mb-6'>
+            <p className='mb-6 text-center text-sm text-muted-foreground'>
               Acesse sua conta
             </p>
             <div>
               <div className='mb-2 block'>
-                <Label htmlFor='username1' className='font-medium'>
+                <Label htmlFor='username1' className='font-semibold'>
                   E-mail
                 </Label>
               </div>
@@ -35,7 +34,7 @@ export const Login = () => {
             </div>
             <div className='mt-6'>
               <div className='mb-2 block'>
-                <Label htmlFor='password1' className='font-medium'>
+                <Label htmlFor='password1' className='font-semibold'>
                   Senha
                 </Label>
               </div>
@@ -50,33 +49,32 @@ export const Login = () => {
               <div className='flex items-center gap-2'>
                 <Checkbox id='remember' checked />
                 <Label
-                  className='text-link font-normal text-sm'
+                  className='text-sm font-normal text-muted-foreground'
                   htmlFor='remember'>
                   Lembrar neste dispositivo
                 </Label>
               </div>
               <Link
                 href='#'
-                className='text-sm font-medium text-primary hover:text-primaryemphasis'>
+                className='text-sm font-medium text-interactive hover:text-interactive-hover'>
                 Esqueceu a senha?
               </Link>
             </div>
             <Button className='w-full' asChild>
               <Link href='/'>Entrar</Link>
             </Button>
-            <div className='flex items center gap-2 justify-center mt-6 flex-wrap'>
-              <p className='text-base font-medium text-link dark:text-darklink'>
+            <div className='mt-6 flex flex-wrap items-center justify-center gap-2'>
+              <p className='text-base font-medium text-muted-foreground'>
                 Ainda não tem conta?
               </p>
               <Link
                 href='/auth/register'
-                className='text-sm font-medium text-primary hover:text-primaryemphasis'>
+                className='text-sm font-medium text-interactive hover:text-interactive-hover'>
                 Criar conta
               </Link>
             </div>
-          </CardBox>
-        </div>
-      </div>
-    </>
+        </CardBox>
+      </section>
+    </main>
   )
 }

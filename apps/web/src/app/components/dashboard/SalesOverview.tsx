@@ -3,10 +3,13 @@ import React, { useState } from 'react';
 import dynamic from "next/dynamic";
 import CardBox from '../shared/CardBox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTheme } from 'next-themes';
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 const SalesOverview = () => {
     const [selectedMonth, setSelectedMonth] = useState("Year 2025");
+    const { resolvedTheme } = useTheme();
+    const isDark = resolvedTheme === "dark";
 
     const chartDataByMonth: Record<string, any> = {
         "Year 2025": {
@@ -43,13 +46,17 @@ const SalesOverview = () => {
             toolbar: { show: false },
             type: "bar" as const,
             fontFamily: "inherit",
-            foreColor: "#7C8FAC",
+            foreColor: "var(--muted-foreground)",
+            background: "transparent",
             height: 310,
             stacked: true,
             width: "100%",
-            offsetX: -20,
+            parentHeightOffset: 0,
         },
-        colors: ["var(--color-primary)", "var(--color-secondary)"],
+        theme: {
+            mode: isDark ? "dark" as const : "light" as const,
+        },
+        colors: ["var(--chart-1)", "var(--chart-2)"],
         plotOptions: {
             bar: {
                 horizontal: false,
@@ -61,9 +68,21 @@ const SalesOverview = () => {
             } as any,
         },
         dataLabels: { enabled: false },
-        legend: { show: false },
+        legend: {
+            show: true,
+            position: "top" as const,
+            horizontalAlign: "left" as const,
+            fontSize: "13px",
+            labels: {
+                colors: "var(--muted-foreground)",
+            },
+            markers: {
+                size: 6,
+                shape: "circle" as const,
+            },
+        },
         grid: {
-            borderColor: "rgba(0,0,0,0.1)",
+            borderColor: "var(--border)",
             strokeDashArray: 3,
         },
         yaxis: {
@@ -77,7 +96,7 @@ const SalesOverview = () => {
             }
         },
         tooltip: {
-            theme: "dark" as const,
+            theme: isDark ? "dark" as const : "light" as const,
             y: {
                 formatter: (val: number) => {
                     return `${val}k`;
@@ -122,13 +141,19 @@ const SalesOverview = () => {
                     </Select>
                 </div>
             </div>
-            <Chart
-                options={ChartData}
-                series={chartDataByMonth[selectedMonth].series}
-                type="bar"
-                height="316px"
-                width={"100%"}
-            />
+            <div
+                role="img"
+                aria-label={`Sales Overview for ${selectedMonth}: monthly Earnings and Expense from January through December.`}
+                className="min-w-0"
+            >
+                <Chart
+                    options={ChartData}
+                    series={chartDataByMonth[selectedMonth].series}
+                    type="bar"
+                    height="316px"
+                    width={"100%"}
+                />
+            </div>
         </CardBox>
     );
 };

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Gota monocromática branca Chuva &amp; Safra</title>
+  <desc id="desc">Símbolo da marca: gota branca com um broto recortado e fundo transparente.</desc>
+  <defs>
+    <mask id="recorte-broto">
+      <rect width="256" height="256" fill="white"/>
+      <path d="M128 188v-65" fill="none" stroke="black" stroke-width="12" stroke-linecap="round"/>
+      <path d="M124 146c-27 0-43-13-46-37 26-1 44 9 50 27Z" fill="black"/>
+      <path d="M132 131c5-24 22-37 47-40-1 26-17 43-45 47Z" fill="black"/>
+    </mask>
+  </defs>
+  <path d="M128 18C108 50 58 98 58 151c0 42 31 75 70 75s70-33 70-75c0-53-50-101-70-133Z" fill="#FFFFFF" mask="url(#recorte-broto)"/>
+</svg>

@@ -72,10 +72,10 @@ const UserProfile = () => {
     };
 
     const socialLinks = [
-        { href: "https://www.facebook.com/wrappixel", icon: "streamline-logos:facebook-logo-2-solid" },
-        { href: "https://twitter.com/wrappixel", icon: "streamline-logos:x-twitter-logo-solid" },
-        { href: "https://github.com/wrappixel", icon: "ion:logo-github" },
-        { href: "https://dribbble.com/wrappixel", icon: "streamline-flex:dribble-logo-remix" },
+        { href: "https://www.facebook.com/wrappixel", icon: "streamline-logos:facebook-logo-2-solid", name: "Facebook" },
+        { href: "https://twitter.com/wrappixel", icon: "streamline-logos:x-twitter-logo-solid", name: "X" },
+        { href: "https://github.com/wrappixel", icon: "ion:logo-github", name: "GitHub" },
+        { href: "https://dribbble.com/wrappixel", icon: "streamline-flex:dribble-logo-remix", name: "Dribbble" },
     ];
 
     return (
@@ -85,21 +85,21 @@ const UserProfile = () => {
                 <CardBox className="p-6 overflow-hidden">
                     <div className="flex flex-col sm:flex-row items-center gap-6 rounded-xl relative w-full break-words">
                         <div>
-                            <Image src={"/images/profile/user-1.jpg"} alt="image" width={80} height={80} className="rounded-full" />
+                            <Image src={"/images/profile/user-1.jpg"} alt={`${personal.firstName} ${personal.lastName}`} width={80} height={80} className="rounded-full" />
                         </div>
                         <div className="flex flex-wrap gap-4 justify-center sm:justify-between items-center w-full">
                             <div className="flex flex-col sm:text-left text-center gap-1.5">
                                 <h5 className="card-title">{personal.firstName} {personal.lastName}</h5>
                                 <div className="flex flex-wrap items-center gap-1 md:gap-3">
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">{personal.position}</p>
-                                    <div className="hidden h-4 w-px bg-gray-300 dark:bg-gray-700 xl:block"></div>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">{address.location}</p>
+                                    <p className="text-sm text-muted-foreground">{personal.position}</p>
+                                    <div className="hidden h-4 w-px bg-border xl:block" aria-hidden="true"></div>
+                                    <p className="text-sm text-muted-foreground">{address.location}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
                                 {socialLinks.map((item, index) => (
-                                    <Link key={index} href={item.href} target="_blank" className="flex h-11 w-11 items-center justify-center gap-2 rounded-full shadow-md border border-defaultBorder hover:bg-gray-50 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
-                                        <Icon icon={item.icon} width="20" height="20" />
+                                    <Link key={index} href={item.href} target="_blank" rel="noopener noreferrer" aria-label={item.name} className="flex h-11 w-11 items-center justify-center gap-2 rounded-full shadow-sm border border-border hover:bg-muted hover:text-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                        <Icon icon={item.icon} width="20" height="20" aria-hidden="true" />
                                     </Link>
                                 ))}
                             </div>
@@ -108,34 +108,34 @@ const UserProfile = () => {
                 </CardBox>
 
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <div className="space-y-6 rounded-xl border border-defaultBorder  md:p-6 p-4 relative w-full break-words">
+                    <div className="space-y-6 rounded-lg border border-border bg-card shadow-sm md:p-6 p-4 relative w-full break-words">
                         <h5 className="card-title">Personal Information</h5>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-7 2xl:gap-x-32">
-                            <div><p className="text-xs text-gray-500">First Name</p><p>{personal.firstName}</p></div>
-                            <div><p className="text-xs text-gray-500">Last Name</p><p>{personal.lastName}</p></div>
-                            <div><p className="text-xs text-gray-500">Email</p><p>{personal.email}</p></div>
-                            <div><p className="text-xs text-gray-500">Phone</p><p>{personal.phone}</p></div>
-                            <div><p className="text-xs text-gray-500">Position</p><p>{personal.position}</p></div>
+                            <div><p className="text-xs text-muted-foreground">First Name</p><p>{personal.firstName}</p></div>
+                            <div><p className="text-xs text-muted-foreground">Last Name</p><p>{personal.lastName}</p></div>
+                            <div><p className="text-xs text-muted-foreground">Email</p><p>{personal.email}</p></div>
+                            <div><p className="text-xs text-muted-foreground">Phone</p><p>{personal.phone}</p></div>
+                            <div><p className="text-xs text-muted-foreground">Position</p><p>{personal.position}</p></div>
                         </div>
                         <div className="flex justify-end">
-                            <Button onClick={() => { setModalType("personal"); setOpenModal(true); }} color={"primary"} className="flex items-center gap-1.5 rounded-md">
-                                <Icon icon="ic:outline-edit" width="18" height="18" /> Edit
+                            <Button onClick={() => { setModalType("personal"); setOpenModal(true); }} className="flex items-center gap-1.5 rounded-md">
+                                <Icon icon="ic:outline-edit" width="18" height="18" aria-hidden="true" /> Edit
                             </Button>
                         </div>
                     </div>
 
-                    <div className="space-y-6 rounded-xl border border-defaultBorder  md:p-6 p-4 relative w-full break-words">
+                    <div className="space-y-6 rounded-lg border border-border bg-card shadow-sm md:p-6 p-4 relative w-full break-words">
                         <h5 className="card-title">Address Details</h5>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-7 2xl:gap-x-32">
-                            <div><p className="text-xs text-gray-500">Location</p><p>{address.location}</p></div>
-                            <div><p className="text-xs text-gray-500">Province / State</p><p>{address.state}</p></div>
-                            <div><p className="text-xs text-gray-500">PIN Code</p><p>{address.pin}</p></div>
-                            <div><p className="text-xs text-gray-500">ZIP</p><p>{address.zip}</p></div>
-                            <div><p className="text-xs text-gray-500">Federal Tax No.</p><p>{address.taxNo}</p></div>
+                            <div><p className="text-xs text-muted-foreground">Location</p><p>{address.location}</p></div>
+                            <div><p className="text-xs text-muted-foreground">Province / State</p><p>{address.state}</p></div>
+                            <div><p className="text-xs text-muted-foreground">PIN Code</p><p>{address.pin}</p></div>
+                            <div><p className="text-xs text-muted-foreground">ZIP</p><p>{address.zip}</p></div>
+                            <div><p className="text-xs text-muted-foreground">Federal Tax No.</p><p>{address.taxNo}</p></div>
                         </div>
                         <div className="flex justify-end">
-                            <Button onClick={() => { setModalType("address"); setOpenModal(true); }} color={"primary"} className="flex items-center gap-1.5 rounded-md">
-                                <Icon icon="ic:outline-edit" width="18" height="18" /> Edit
+                            <Button onClick={() => { setModalType("address"); setOpenModal(true); }} className="flex items-center gap-1.5 rounded-md">
+                                <Icon icon="ic:outline-edit" width="18" height="18" aria-hidden="true" /> Edit
                             </Button>
                         </div>
                     </div>
@@ -285,10 +285,10 @@ const UserProfile = () => {
                     )}
 
                     <DialogFooter className="flex gap-2 mt-4">
-                        <Button color={"primary"} className="rounded-md" onClick={handleSave}>
+                        <Button className="rounded-md" onClick={handleSave}>
                             Save Changes
                         </Button>
-                        <Button color={"lighterror"} className="rounded-md bg-lighterror dark:bg-darkerror text-error hover:bg-error hover:text-white" onClick={() => setOpenModal(false)}>
+                        <Button variant="outline" className="rounded-md" onClick={() => setOpenModal(false)}>
                             Close
                         </Button>
                     </DialogFooter>
