@@ -36,13 +36,13 @@ const Profile = () => {
 
         <DropdownMenuContent
           align='end'
-          className='w-[calc(100vw-2rem)] rounded-xl border border-border pb-4 pt-2 sm:w-[220px]'>
+          className='w-[184px] rounded-xl border border-border pb-3 pt-1'>
           <SimpleBar>
             {profileData.profileDD.map((item, index) => (
               <DropdownMenuItem key={index} asChild>
                 <Link
                   href={item.url}
-                  className='group/link flex min-h-11 w-full items-center justify-between px-4 py-2 hover:bg-secondary hover:text-interactive'>
+                  className='group/link flex min-h-11 w-full items-center px-3 py-1.5 hover:bg-secondary hover:text-interactive'>
                   <div className='flex items-center gap-3 w-full'>
                     <Icon
                       icon={item.icon}
@@ -58,9 +58,9 @@ const Profile = () => {
             ))}
           </SimpleBar>
 
-          <DropdownMenuSeparator className='my-2' />
+          <DropdownMenuSeparator className='my-1' />
 
-          <div className='px-4'>
+          <div className='px-3'>
             <Button variant='outline' asChild className='w-full rounded-md'>
               <Link href='/auth/login'>Logout</Link>
             </Button>
