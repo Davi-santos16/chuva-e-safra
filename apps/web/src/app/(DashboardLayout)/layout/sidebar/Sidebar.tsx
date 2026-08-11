@@ -58,8 +58,6 @@ const renderSidebarItems = (
     }
 
     // Regular menu item
-    const linkTarget = item.url?.startsWith('https') ? '_blank' : '_self'
-
     const itemClassNames = isSubItem
       ? `mt-0.5 text-link dark:text-darklink !hover:bg-transparent ${isSelected ? '!bg-transparent !text-primary' : ''
       } !px-1.5`
@@ -72,12 +70,9 @@ const renderSidebarItems = (
           icon={iconElement}
           isSelected={isSelected}
           link={item.url || undefined}
-          target={linkTarget}
-          badge={!!item.isPro}
-          badgeColor='bg-lightsecondary'
-          badgeTextColor='text-secondary'
+          target='_self'
+          badge={false}
           disabled={item.disabled}
-          badgeContent={item.isPro ? 'Pro' : undefined}
           component={Link}
           className={`${itemClassNames}`}>
           <span className='truncate flex-1'>{item.title || item.name}</span>

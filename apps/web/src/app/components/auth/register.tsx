@@ -17,18 +17,18 @@ export const Register = () => {
               <FullLogo />
             </div>
             <p className='text-sm text-charcoal text-center mb-6'>
-              Your Social Campaigns
+              Crie sua conta
             </p>
             <div>
               <div className='mb-2 block'>
                 <Label htmlFor='name1' className='font-medium'>
-                  Name
+                  Nome
                 </Label>
               </div>
               <Input
                 id='name1'
                 type='text'
-                placeholder='Enter your name'
+                placeholder='Digite seu nome'
                 required
               />
             </div>
@@ -41,34 +41,34 @@ export const Register = () => {
               <Input
                 id='email1'
                 type='email'
-                placeholder='Enter your email'
+                placeholder='Digite seu e-mail'
                 required
               />
             </div>
             <div className='mt-6'>
               <div className='mb-2 block'>
                 <Label htmlFor='password1' className='font-medium'>
-                  Password
+                  Senha
                 </Label>
               </div>
               <Input
                 id='password1'
                 type='password'
-                placeholder='Enter your password'
+                placeholder='Digite sua senha'
                 required
               />
             </div>
             <Button className='w-full mt-6' asChild>
-              <Link href='/'>Sign Up</Link>
+              <Link href='/'>Cadastrar</Link>
             </Button>
             <div className='flex items center gap-2 justify-center mt-6 flex-wrap'>
               <p className='text-base font-medium text-link dark:text-darklink'>
-                Already have an account?
+                Já tem uma conta?
               </p>
               <Link
                 href='/auth/login'
                 className='text-sm font-medium text-primary hover:text-primaryemphasis'>
-                Sign In
+                Entrar
               </Link>
             </div>
           </CardBox>
