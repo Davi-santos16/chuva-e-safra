@@ -40,7 +40,7 @@ const BlogFeaturedCard = ({ post, index }: Btype) => {
     <>
       {post ? (
         <div
-          className={`lg:col-span-${mainPost ? 8 : 4} md:col-span-12 col-span-12`}
+          className={`${mainPost ? "lg:col-span-8" : "lg:col-span-4"} md:col-span-12 col-span-12`}
         >
           <Card className="w-full h-[400px] p-0 overflow-hidden flex-row shadow-none feature-card relative card-hover">
             {/* Background Image */}
@@ -48,40 +48,40 @@ const BlogFeaturedCard = ({ post, index }: Btype) => {
               <img
                 src={coverImg}
                 alt={title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 motion-reduce:transition-none motion-reduce:transform-none"
               />
-              <div className="absolute inset-0 bg-black opacity-50 mix-blend-multiply"></div>
+              <div className="absolute inset-0 bg-primary/70" aria-hidden="true"></div>
             </div>
 
             {/* Content */}
             <div className="absolute inset-0 p-6 flex flex-col justify-between">
               <div className="flex justify-between items-center">
-                <Avatar className="h-10 w-10">
+                <Avatar className="h-10 w-10" role="img" aria-label={author?.name}>
                   <AvatarImage src={author?.avatar} alt={author?.name} />
                   <AvatarFallback>
                     {author?.name ? author.name[0] : "?"}
                   </AvatarFallback>
                 </Avatar>
 
-                <Badge className="rounded-md bg-primary text-white">
+                <Badge className="rounded-md bg-primary text-primary-foreground">
                   {category}
                 </Badge>
               </div>
 
               <div>
-                <h2 className="text-2xl text-white my-6">
+                <h2 className="text-2xl text-primary-foreground my-6">
                   <Link href={`/apps/blog/detail/${linkTo}`}>{title}</Link>
                 </h2>
-                <div className="flex gap-3">
-                  <div className="flex gap-2 items-center text-white text-[15px]">
-                    <Icon icon="tabler:eye" height="18" /> {view}
+                <div className="flex flex-wrap gap-3 text-primary-foreground">
+                  <div className="flex gap-2 items-center text-[15px]">
+                    <Icon icon="tabler:eye" height="18" aria-hidden="true" /> {view}
                   </div>
-                  <div className="flex gap-2 items-center text-white text-[15px]">
-                    <Icon icon="tabler:message-2" height="18" />{" "}
+                  <div className="flex gap-2 items-center text-[15px]">
+                    <Icon icon="tabler:message-2" height="18" aria-hidden="true" />{" "}
                     {comments?.length}
                   </div>
-                  <div className="ms-auto flex gap-2 items-center text-white text-[15px]">
-                    <GoDot size="16" />
+                  <div className="ms-auto flex gap-2 items-center text-[15px] tabular-nums">
+                    <GoDot size="16" aria-hidden="true" />
                     <small>{format(new Date(createdAt), "E, MMM d")}</small>
                   </div>
                 </div>

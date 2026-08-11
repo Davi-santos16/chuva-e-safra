@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { useTheme } from 'next-themes'
 import { usePathname } from 'next/navigation'
 import SidebarContent from './Sidebaritems'
@@ -27,9 +26,14 @@ const renderSidebarItems = (
     const IconComp = item.icon || null
 
     const iconElement = IconComp ? (
-      <Icon icon={IconComp} height={21} width={21} />
+      <Icon icon={IconComp} height={21} width={21} aria-hidden='true' />
     ) : (
-      <Icon icon={'ri:checkbox-blank-circle-line'} height={9} width={9} />
+      <Icon
+        icon='ri:checkbox-blank-circle-line'
+        height={9}
+        width={9}
+        aria-hidden='true'
+      />
     )
 
     // Heading
@@ -38,7 +42,7 @@ const renderSidebarItems = (
         <div className='mb-1' key={item.heading}>
           <AMMenu
             subHeading={item.heading}
-            ClassName='hide-menu leading-21 text-charcoal font-bold uppercase text-xs dark:text-darkcharcoal'
+            ClassName='hide-menu leading-21 text-sidebar-foreground/65 font-semibold uppercase text-xs tracking-wide'
           />
         </div>
       )
@@ -51,7 +55,7 @@ const renderSidebarItems = (
           key={item.id}
           icon={iconElement}
           title={item.name}
-          ClassName='mt-0.5 text-link dark:text-darklink'>
+          ClassName='mt-0.5 text-sidebar-foreground/80'>
           {renderSidebarItems(item.children, currentPath, onClose, true)}
         </AMSubmenu>
       )
@@ -59,9 +63,8 @@ const renderSidebarItems = (
 
     // Regular menu item
     const itemClassNames = isSubItem
-      ? `mt-0.5 text-link dark:text-darklink !hover:bg-transparent ${isSelected ? '!bg-transparent !text-primary' : ''
-      } !px-1.5`
-      : `mt-0.5 text-link dark:text-darklink`
+      ? 'mt-0.5 text-sidebar-foreground/80 !px-1.5'
+      : 'mt-0.5 text-sidebar-foreground/80'
 
     return (
       <div onClick={onClose} key={index}>
@@ -84,31 +87,37 @@ const renderSidebarItems = (
 
 const SidebarLayout = ({ onClose }: { onClose?: () => void }) => {
   const pathname = usePathname()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
+  const isMobile = Boolean(onClose)
 
   // Only allow "light" or "dark" for AMSidebar
-  const sidebarMode = theme === 'light' || theme === 'dark' ? theme : undefined
+  const sidebarMode = resolvedTheme === 'dark' ? 'dark' : 'light'
 
   return (
     <AMSidebar
       collapsible='none'
       animation={true}
       showProfile={false}
-      width={'270px'}
+      width={isMobile ? 'min(270px, 85vw)' : '270px'}
       showTrigger={false}
       mode={sidebarMode}
-      className='fixed left-0 top-0 xl:top-[68px] border border-border dark:border-darkborder bg-white dark:bg-dark z-10 h-screen'>
+      themeColor='var(--primary)'
+      themeSecondaryColor='var(--success)'
+      textColor='var(--sidebar-foreground)'
+      className={`${
+        isMobile ? 'relative border-0' : 'fixed inset-y-0 left-0 border-e border-sidebar-border'
+      } z-10 h-dvh bg-sidebar text-sidebar-foreground`}>
       {/* Logo */}
-      <div className='px-6 flex items-center brand-logo overflow-hidden'>
+      <div className='brand-logo flex min-h-[72px] items-center overflow-hidden border-b border-sidebar-border px-6'>
         <AMLogo component={Link} href='/' img=''>
-          <FullLogo />
+          <FullLogo surface='dark' className='w-[184px]' priority />
         </AMLogo>
       </div>
 
       {/* Sidebar items */}
 
-      <SimpleBar className='h-[calc(100vh-100px)]'>
-        <div className='px-6'>
+      <SimpleBar className='h-[calc(100dvh-72px)]'>
+        <div className='px-6 py-4'>
           {SidebarContent.map((section, index) => (
             <div key={index}>
               {renderSidebarItems(
@@ -123,21 +132,16 @@ const SidebarLayout = ({ onClose }: { onClose?: () => void }) => {
           ))}
 
           {/* Promo Section */}
-          <div className='mt-9  overflow-hidden'>
-            <div className='flex w-full bg-lightprimary rounded-lg p-6'>
-              <div className='lg:w-1/2 w-full'>
-                <h5 className='text-base text-charcoal'>Haven't Account?</h5>
+          <div className='mt-9 overflow-hidden'>
+            <div className='flex w-full rounded-xl border border-sidebar-foreground/10 bg-sidebar-foreground/10 p-6'>
+              <div className='w-1/2'>
+                <h5 className='text-base text-sidebar-foreground'>Haven't Account?</h5>
                 <Button asChild>
-                  <Link href="/auth/register" className='whitespace-nowrap mt-2 text-[13px]'>Sign up</Link>
+                  <Link href='/auth/register' className='mt-2 whitespace-nowrap text-[13px]'>Sign up</Link>
                 </Button>
               </div>
-              <div className='lg:w-1/2 w-full -mt-4 ml-[26px] scale-[1.2] shrink-0'>
-                <Image
-                  src={'/images/backgrounds/rocket.png'}
-                  alt='rocket'
-                  width={100}
-                  height={100}
-                />
+              <div className='flex w-1/2 shrink-0 items-center justify-end'>
+                <FullLogo compact surface='dark' className='w-16' />
               </div>
             </div>
           </div>

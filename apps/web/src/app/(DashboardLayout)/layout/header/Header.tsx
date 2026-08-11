@@ -3,17 +3,22 @@
 import { useState, useEffect } from 'react'
 import { useTheme } from 'next-themes'
 import { Icon } from '@iconify/react'
+import Link from 'next/link'
 import Profile from './Profile'
 import Notifications from './Notifications'
 import SidebarLayout from '../sidebar/Sidebar'
 import FullLogo from '../shared/logo/FullLogo'
 import { Input } from '@/components/ui/input'
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTitle,
+} from '@/components/ui/sheet'
 
 const Header = () => {
-  const { theme, setTheme } = useTheme()
+  const { resolvedTheme, setTheme } = useTheme()
   const [isSticky, setIsSticky] = useState(false)
-  const [mobileMenu, setMobileMenu] = useState('')
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
@@ -25,108 +30,118 @@ const Header = () => {
       }
     }
 
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 
   const toggleMode = () => {
-    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'))
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
   }
+
+  const isDark = resolvedTheme === 'dark'
+  const themeLabel = isDark ? 'Ativar modo claro' : 'Ativar modo escuro'
 
   return (
     <>
       <header
-        className={`sticky top-0 z-2 ${
-          isSticky ? 'bg-background shadow-md fixed w-full' : 'bg-transparent'
+        className={`app-header sticky top-0 z-40 border-b border-border bg-background ${
+          isSticky ? 'shadow-sm' : 'shadow-none'
         }`}>
         <nav
-          className={`rounded-none  py-4 sm:ps-6 max-w-full! sm:pe-10 dark:bg-dark flex justify-between items-center px-6`}>
+          aria-label='Navegação principal'
+          className='flex min-h-[72px] max-w-full! items-center justify-between gap-1 px-4 py-3 md:px-6 xl:px-8'>
           {/* Mobile Toggle Icon */}
-          <div
+          <button
+            type='button'
+            aria-label='Abrir menu de navegação'
+            aria-controls='mobile-navigation'
+            aria-expanded={isOpen}
             onClick={() => {
               setIsOpen(true)
             }}
-            className='px-[15px] hover:text-primary dark:hover:text-primary text-link dark:text-darklink relative after:absolute after:w-10 after:h-10 after:rounded-full hover:after:bg-lightprimary  after:bg-transparent rounded-full xl:hidden flex justify-center items-center cursor-pointer'>
-            <Icon icon='tabler:menu-2' height={20} width={20} />
-          </div>
+            className='inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-foreground transition-colors hover:bg-secondary hover:text-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 xl:hidden'>
+            <Icon
+              icon='tabler:menu-2'
+              height={20}
+              width={20}
+              aria-hidden='true'
+            />
+          </button>
 
-          <div className='block xl:hidden'>
-            <FullLogo />
-          </div>
+          <Link
+            href='/'
+            aria-label='Ir para o início'
+            className='inline-flex min-h-11 shrink-0 items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 xl:hidden'>
+            <FullLogo priority className='w-[140px] sm:w-[168px]' />
+          </Link>
 
-          <div className='flex xl:hidden items-center'>
-            <div
-              className='hover:text-primary px-2 md:px-15 group focus:ring-0 rounded-full flex justify-center items-center cursor-pointer text-gray relative'
+          <div className='flex shrink-0 items-center xl:hidden'>
+            <button
+              type='button'
+              aria-label={themeLabel}
+              title={themeLabel}
+              className='inline-flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
               onClick={toggleMode}>
-              <span className='flex items-center justify-center relative after:absolute after:w-10 after:h-10 after:rounded-full after:-top-1/2   group-hover:after:bg-lightprimary'>
-                {theme === 'light' ? (
-                  <Icon icon='tabler:moon' width='20' />
-                ) : (
-                  <Icon
-                    icon='solar:sun-bold-duotone'
-                    width='20'
-                    className='group-hover:text-primary'
-                  />
-                )}
-              </span>
-            </div>
+              {isDark ? (
+                <Icon
+                  icon='solar:sun-bold-duotone'
+                  width='20'
+                  aria-hidden='true'
+                />
+              ) : (
+                <Icon icon='tabler:moon' width='20' aria-hidden='true' />
+              )}
+            </button>
 
-            <div className='xl:block '>
-              <div className='flex gap-0 items-center relative'>
-                {/* Chat */}
-                <Notifications />
-              </div>
-            </div>
+            <Notifications />
 
             {/* Profile Dropdown */}
             <Profile />
           </div>
 
-          <div className='hidden xl:flex items-center justify-between w-full'>
+          <div className='hidden w-full items-center justify-between xl:flex'>
             <div className='flex items-center gap-2'>
               {/* Search Icon */}
 
-              <div className='relative'>
+              <div className='relative w-64'>
                 <Icon
                   icon='solar:magnifer-linear'
                   width={18}
                   height={18}
-                  className='absolute left-3 top-1/2 -translate-y-1/2'
+                  aria-hidden='true'
+                  className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground'
                 />
                 <Input
                   type='text'
+                  aria-label='Pesquisar'
                   placeholder='Search...'
-                  className='rounded-xl pl-10'
+                  className='h-11 rounded-xl pl-10'
                 />
               </div>
             </div>
-            <div className='flex w-full justify-end items-end'>
-              <div className='flex gap-0 items-center '>
+            <div className='flex w-full items-center justify-end'>
+              <div className='flex items-center'>
                 {/* ✅ Dark/Light Toggle */}
-                <div
-                  className='hover:text-primary px-15 group focus:ring-0 rounded-full flex justify-center items-center cursor-pointer text-gray relative'
+                <button
+                  type='button'
+                  aria-label={themeLabel}
+                  title={themeLabel}
+                  className='inline-flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                   onClick={toggleMode}>
-                  <span className='flex items-center justify-center relative after:absolute after:w-10 after:h-10 after:rounded-full after:-top-1/2   group-hover:after:bg-lightprimary'>
-                    {theme === 'light' ? (
-                      <Icon icon='tabler:moon' width='20' />
-                    ) : (
-                      <Icon
-                        icon='solar:sun-bold-duotone'
-                        width='20'
-                        className='group-hover:text-primary'
-                      />
-                    )}
-                  </span>
-                </div>
+                  {isDark ? (
+                    <Icon
+                      icon='solar:sun-bold-duotone'
+                      width='20'
+                      aria-hidden='true'
+                    />
+                  ) : (
+                    <Icon icon='tabler:moon' width='20' aria-hidden='true' />
+                  )}
+                </button>
 
-                <div className='xl:block '>
-                  <div className='flex gap-0 items-center relative'>
-                    {/* Chat */}
-                    <Notifications />
-                  </div>
-                </div>
+                <Notifications />
 
                 {/* Profile Dropdown */}
                 <Profile />
@@ -138,8 +153,19 @@ const Header = () => {
 
       {/* Mobile Sidebar */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent side='left' className='w-64 p-0'>
+        <SheetContent
+          id='mobile-navigation'
+          side='left'
+          className='w-[270px] max-w-[85vw] overflow-hidden border-sidebar-border bg-sidebar p-0 text-sidebar-foreground [&>button:last-child]:hidden'>
           <SheetTitle className='sr-only'>Navegação</SheetTitle>
+          <SheetClose asChild>
+            <button
+              type='button'
+              aria-label='Fechar menu de navegação'
+              className='absolute right-3 top-3 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full text-sidebar-foreground transition-colors hover:bg-sidebar-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar'>
+              <Icon icon='tabler:x' width={20} aria-hidden='true' />
+            </button>
+          </SheetClose>
           <SidebarLayout onClose={() => setIsOpen(false)} />
         </SheetContent>
       </Sheet>

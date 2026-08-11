@@ -71,7 +71,7 @@ const BlogDetailData = () => {
               <div className="overflow-hidden max-h-[440px]">
                 <Image
                   src={post?.coverImg}
-                  alt="materialm"
+                  alt={post?.title}
                   height={440}
                   width={1500}
                   className="w-full object-cover object-center"
@@ -84,7 +84,7 @@ const BlogDetailData = () => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Avatar className="h-10 w-10">
+                      <Avatar className="h-10 w-10" role="img" aria-label={post?.author.name}>
                         <AvatarImage src={post?.author.avatar} alt={post?.author.name} />
                         <AvatarFallback>
                           {post?.author?.name?.[0] || "?"}
@@ -102,21 +102,21 @@ const BlogDetailData = () => {
               </Badge>
               <h2 className="md:text-4xl text-2xl my-6">{post?.title}</h2>
               <div>
-                <div className="flex gap-3">
-                  <div className="flex gap-2 items-center text-darklink text-[15px]">
-                    <Icon icon="tabler:eye" height="18" className="text-ld" />
+                <div className="flex flex-wrap gap-3 text-muted-foreground">
+                  <div className="flex gap-2 items-center text-[15px]">
+                    <Icon icon="tabler:eye" height="18" aria-hidden="true" />
                     {post?.view}
                   </div>
-                  <div className="flex gap-2 items-center text-darklink text-[15px]">
+                  <div className="flex gap-2 items-center text-[15px]">
                     <Icon
                       icon="tabler:message-2"
                       height="18"
-                      className="text-ld"
+                      aria-hidden="true"
                     />{" "}
                     {post?.comments?.length || 0}
                   </div>
-                  <div className="ms-auto flex gap-2 items-center text-darklink text-[15px]">
-                    <GoDot size="16" className="text-ld" />
+                  <div className="ms-auto flex gap-2 items-center text-[15px] tabular-nums">
+                    <GoDot size="16" aria-hidden="true" />
                     <small>
                       {post && post.createdAt
                         ? format(new Date(post.createdAt), "E, MMM d")
@@ -127,24 +127,24 @@ const BlogDetailData = () => {
               </div>
             </div>
 
-            <Separator className="my-0 mb-4 bg-gray-200 dark:bg-gray-700" />
+            <Separator className="my-0 mb-4 bg-border" />
 
             <div className="px-6 pb-6">
               <h2 className="md:text-3xl text-2xl pb-5">Title of the paragraph</h2>
-              <p className="text-darklink">
+              <p className="text-muted-foreground">
                 But you cannot figure out what it is or what it can do...
               </p>
               <br />
-              <p className="text-darklink">
+              <p className="text-muted-foreground">
                 Gigure out what it is or what it can do...
               </p>
               <br />
               <p>
-                <b className="text-ld">This is strong text.</b>
+                <b className="text-foreground">This is strong text.</b>
               </p>
               <i>This is italic text.</i>
 
-              <Separator className="my-8 h-px border-0 bg-gray-200 dark:bg-gray-700"/>
+              <Separator className="my-8 h-px border-0 bg-border"/>
 
               <h3 className="text-xl mb-3">Unorder list</h3>
               <ul className="list-disc pl-6">
@@ -153,7 +153,7 @@ const BlogDetailData = () => {
                 <li>It allows you to start your bid</li>
               </ul>
 
-              <Separator className="my-8 h-px border-0 bg-gray-200 dark:bg-gray-700"/>
+              <Separator className="my-8 h-px border-0 bg-border"/>
 
               <h3 className="text-xl mb-3">Order list</h3>
               <ol className="list-decimal pl-6">
@@ -162,12 +162,12 @@ const BlogDetailData = () => {
                 <li>It allows you to start your bid</li>
               </ol>
 
-              <Separator className="my-8 h-px border-0 bg-gray-200 dark:bg-gray-700"/>
+              <Separator className="my-8 h-px border-0 bg-border"/>
 
               <h3 className="text-xl mb-3">Quotes</h3>
-              <div className="pt-5 pb-4 px-4 rounded-md border-s-2 border-primary bg-lightgray dark:bg-darkmuted flex gap-1 items-start">
-                <FaQuoteLeft size={20} className="text-ld -mt-1" />
-                <h2 className="text-base font-bold">
+              <div className="pt-5 pb-4 px-4 rounded-lg border-s-2 border-interactive bg-accent text-accent-foreground flex gap-2 items-start">
+                <FaQuoteLeft size={20} className="text-accent-foreground -mt-1" aria-hidden="true" />
+                <h2 className="text-base font-bold text-accent-foreground">
                   Life is short, Smile while you still have teeth!
                 </h2>
               </div>
@@ -176,7 +176,11 @@ const BlogDetailData = () => {
 
           <CardBox className="mt-6">
             <h5 className="text-xl mb-2">Post Comments</h5>
+            <label htmlFor="post-comment" className="sr-only">
+              Write your comment
+            </label>
             <Textarea
+              id="post-comment"
               rows={4}
               value={replyTxt}
               onChange={(e) => setReplyTxt(e.target.value)}
@@ -193,7 +197,7 @@ const BlogDetailData = () => {
             <div className="mt-6">
               <div className="flex gap-3 items-center">
                 <h5 className="text-xl">Comments</h5>
-                <div className="h-8 w-8 rounded-full bg-lightprimary dark:bg-lightprimary flex items-center justify-center text-primary font-bold">
+                <div className="h-8 min-w-8 rounded-full bg-interactive/10 flex items-center justify-center text-interactive font-bold tabular-nums">
                   {post?.comments?.length || 0}
                 </div>
               </div>

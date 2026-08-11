@@ -72,12 +72,22 @@ const TicketListing = ({ tickets, deleteTicket, searchTickets, ticketSearch, fil
 
   const ticketBadge = (ticket: TicketType) => {
     return ticket.Status === "Open"
-      ? "lightSuccess"
+      ? "bg-success-soft text-success"
       : ticket.Status === "Closed"
-      ? "lightError"
+      ? "bg-destructive-soft text-destructive"
       : ticket.Status === "Pending"
-      ? "lightWarning"
-      : "default";
+      ? "bg-warning-soft text-foreground"
+      : "bg-muted text-muted-foreground";
+  };
+
+  const ticketBadgeIcon = (ticket: TicketType) => {
+    return ticket.Status === "Open"
+      ? "tabler:circle-check"
+      : ticket.Status === "Closed"
+      ? "tabler:circle-x"
+      : ticket.Status === "Pending"
+      ? "tabler:clock"
+      : "tabler:info-circle";
   };
 
   return (
@@ -94,13 +104,15 @@ const TicketListing = ({ tickets, deleteTicket, searchTickets, ticketSearch, fil
           <Icon
             icon="tabler:search"
             height={18}
-            className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+            aria-hidden="true"
           />
           <Input
             type="text"
             className="pl-8"
             onChange={(e) => searchTickets(e.target.value)}
             placeholder="Search"
+            aria-label="Search tickets"
           />
         </div>
       </div>
@@ -119,7 +131,7 @@ const TicketListing = ({ tickets, deleteTicket, searchTickets, ticketSearch, fil
           </TableHeader>
           <TableBody>
             {visibleTickets.map((ticket) => (
-              <TableRow key={ticket.Id}>
+              <TableRow key={ticket.Id} className="hover:bg-primary/5">
                 <TableCell>{ticket.Id}</TableCell>
 
                 <TableCell className="max-w-md">
@@ -142,13 +154,14 @@ const TicketListing = ({ tickets, deleteTicket, searchTickets, ticketSearch, fil
                 </TableCell>
 
                 <TableCell>
-                  <Badge variant={`${ticketBadge(ticket)}`} className={` rounded-md`}>
+                  <Badge className={`gap-1.5 rounded-md border-0 ${ticketBadge(ticket)}`}>
+                    <Icon icon={ticketBadgeIcon(ticket)} height={14} aria-hidden="true" />
                     {ticket.Status}
                   </Badge>
                 </TableCell>
 
                 <TableCell>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground tabular-nums">
                     {format(new Date(ticket.Date), "E, MMM d")}
                   </p>
                 </TableCell>
@@ -160,10 +173,11 @@ const TicketListing = ({ tickets, deleteTicket, searchTickets, ticketSearch, fil
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="hover:text-red-600"
+                          className="hover:bg-destructive/10 hover:text-destructive"
                           onClick={() => deleteTicket(ticket.Id)}
+                          aria-label={`Delete ticket ${ticket.Id}`}
                         >
-                          <Icon icon="tabler:trash" height="18" />
+                          <Icon icon="tabler:trash" height="18" aria-hidden="true" />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>

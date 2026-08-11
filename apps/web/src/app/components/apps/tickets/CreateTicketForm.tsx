@@ -105,10 +105,10 @@ const CreateTicketForm = () => {
   return (
     <CardBox>
       <h2 className="text-lg font-semibold mb-4">Create New Ticket</h2>
-      <p>ID : {ticketId !== undefined ? ticketId : ""}</p>
-      <p>Date : {formattedOrderDate}</p>
+      <p className="text-muted-foreground tabular-nums">ID : {ticketId !== undefined ? ticketId : ""}</p>
+      <p className="text-muted-foreground">Date : {formattedOrderDate}</p>
 
-      <div className="bg-lightgray dark:bg-gray-800/70 p-6 my-6 rounded-md">
+      <div className="bg-muted p-6 my-6 rounded-lg border border-border">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Ticket Title */}
           <div>
@@ -144,7 +144,7 @@ const CreateTicketForm = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="default">{selectedAgent.name}
-                <ChevronDown className="h-4 w-4 ml-1" />
+                <ChevronDown className="h-4 w-4 ml-1" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="rounded-md">
@@ -168,12 +168,12 @@ const CreateTicketForm = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Button onClick={handleSubmit} className="rounded-md">
               Save
             </Button>
             <Button
-              variant="destructive"
+              variant="outline"
               className="rounded-md"
               onClick={() => router.push("/apps/tickets")}
             >

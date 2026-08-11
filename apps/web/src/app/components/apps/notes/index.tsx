@@ -179,10 +179,11 @@ const NotesApp = () => {
           <div className='flex justify-between items-center border-b border-ld py-4 px-6'>
             <div className='flex gap-3 items-center'>
               <Button
-                color={'lightprimary'}
+                variant='secondary'
                 onClick={() => setIsOpen(true)}
-                className='btn-circle p-0 lg:!hidden flex '>
-                <Icon icon='tabler:menu-2' height={18} />
+                className='btn-circle p-0 lg:!hidden flex'
+                aria-label='Open notes list'>
+                <Icon icon='tabler:menu-2' height={18} aria-hidden='true' />
               </Button>
               <h6 className='text-base'>Edit Note</h6>
             </div>

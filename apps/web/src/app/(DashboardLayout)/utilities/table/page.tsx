@@ -13,6 +13,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+const priorityStyles: Record<string, string> = {
+  Low: "bg-secondary text-interactive",
+  Medium: "bg-warning-soft text-foreground",
+  High: "bg-destructive-soft text-destructive",
+};
+
+const priorityIcons: Record<string, string> = {
+  Low: "tabler:info-circle",
+  Medium: "tabler:clock",
+  High: "tabler:alert-triangle",
+};
 
 const page = () => {
 
@@ -24,8 +37,6 @@ const page = () => {
       designation: "Web Designer",
       project: "Elite Admin",
       priority: "Low",
-      color: "primary",
-      bgcolor: "bg-primary text-white",
       budget: "3.9k"
     },
     {
@@ -35,8 +46,6 @@ const page = () => {
       designation: "Web Developer",
       project: "Flexy Admin",
       priority: "Medium",
-      color: "warning",
-      bgcolor: "bg-warning text-white",
       budget: "24.5k"
     },
     {
@@ -46,7 +55,6 @@ const page = () => {
       designation: "Web Manager",
       project: "Material",
       priority: "High",
-      color: "warning",
       budget: "12.8k"
     },
     {
@@ -56,8 +64,6 @@ const page = () => {
       designation: "Project Manager",
       project: "Xtreme Admin",
       priority: "Low",
-      color: "success",
-      bgcolor: "bg-success text-white",
       budget: "4.8k"
     },
     {
@@ -67,8 +73,6 @@ const page = () => {
       designation: "Content Writer",
       project: "Helping Hands WP Theme",
       priority: "High",
-      color: "error",
-      bgcolor: "bg-error text-white",
       budget: "9.3k"
     },
   ]
@@ -119,13 +123,13 @@ const page = () => {
 
                   <TableBody>
                     {PerformersData.map((item, index) => (
-                      <TableRow key={index} className="border-b border-defaultBorder">
+                      <TableRow key={index} className="border-b border-border hover:bg-primary/5">
                         {/* Assigned */}
                         <TableCell className="ps-0 min-w-[200px]">
                           <div className="flex gap-3 items-center">
                             <Image
                               src={item.profileImg}
-                              alt="profile"
+                              alt={item.username}
                               width={40}
                               height={40}
                               className="h-10 w-10 rounded-full"
@@ -134,7 +138,7 @@ const page = () => {
                               <h6 className="text-sm font-semibold mb-1">
                                 {item.username}
                               </h6>
-                              <p className="text-xs text-slateGray font-medium">
+                              <p className="text-xs text-muted-foreground font-medium">
                                 {item.designation}
                               </p>
                             </div>
@@ -143,7 +147,7 @@ const page = () => {
 
                         {/* Project */}
                         <TableCell>
-                          <p className="text-charcoal text-sm font-medium">
+                          <p className="text-foreground text-sm font-medium">
                             {item.project}
                           </p>
                         </TableCell>
@@ -151,8 +155,9 @@ const page = () => {
                         {/* Priority */}
                         <TableCell>
                           <Badge
-                            className={`text-sm rounded-full py-1 px-3 justify-center ${item.bgcolor}`}
+                            className={`gap-1.5 border-0 text-sm py-1 px-3 ${priorityStyles[item.priority]}`}
                           >
+                            <Icon icon={priorityIcons[item.priority]} height={14} aria-hidden="true" />
                             {item.priority}
                           </Badge>
                         </TableCell>
@@ -161,9 +166,9 @@ const page = () => {
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <span className="h-9 w-9 flex justify-center items-center rounded-full hover:bg-lightprimary hover:text-primary cursor-pointer">
-                                <TbDotsVertical size={22} />
-                              </span>
+                              <Button variant="ghost" size="icon" aria-label={`Open actions for ${item.username}`}>
+                                <TbDotsVertical size={22} aria-hidden="true" />
+                              </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-40">
                               {tableActionData.map((action, idx) => (
@@ -171,7 +176,7 @@ const page = () => {
                                   key={idx}
                                   className="flex gap-3 items-center"
                                 >
-                                  <Icon icon={action.icon} height={18} />
+                                  <Icon icon={action.icon} height={18} aria-hidden="true" />
                                   <span>{action.listtitle}</span>
                                 </DropdownMenuItem>
                               ))}

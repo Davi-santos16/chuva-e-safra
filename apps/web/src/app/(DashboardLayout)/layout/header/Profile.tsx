@@ -16,35 +16,40 @@ import {
 
 const Profile = () => {
   return (
-    <div className='relative group/menu ps-15 shrink-0'>
+    <div className='group/menu relative shrink-0'>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <span className='hover:text-primary hover:bg-lightprimary rounded-full flex justify-center items-center cursor-pointer group-hover/menu:bg-lightprimary group-hover/menu:text-primary'>
+          <button
+            type='button'
+            aria-label='Abrir menu do perfil'
+            title='Perfil'
+            className='inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'>
             <Image
               src='/images/profile/user-1.jpg'
-              alt='logo'
-              height={35}
-              width={35}
-              className='rounded-full'
+              alt='Foto de perfil'
+              height={36}
+              width={36}
+              className='rounded-full object-cover'
             />
-          </span>
+          </button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
           align='end'
-          className='w-screen sm:w-[200px] pb-4 pt-2 rounded-sm'>
+          className='w-[calc(100vw-2rem)] rounded-xl border border-border pb-4 pt-2 sm:w-[220px]'>
           <SimpleBar>
             {profileData.profileDD.map((item, index) => (
               <DropdownMenuItem key={index} asChild>
                 <Link
                   href={item.url}
-                  className='px-4 py-2 flex justify-between items-center group/link w-full hover:bg-lightprimary hover:text-primary'>
+                  className='group/link flex min-h-11 w-full items-center justify-between px-4 py-2 hover:bg-secondary hover:text-interactive'>
                   <div className='flex items-center gap-3 w-full'>
                     <Icon
                       icon={item.icon}
-                      className='text-lg text-slateGray group-hover/link:text-primary'
+                      aria-hidden='true'
+                      className='text-lg text-muted-foreground group-hover/link:text-interactive'
                     />
-                    <h5 className='mb-0 text-sm text-slateGray group-hover/link:text-primary'>
+                    <h5 className='mb-0 font-sans text-sm font-medium text-muted-foreground group-hover/link:text-interactive'>
                       {item.title}
                     </h5>
                   </div>

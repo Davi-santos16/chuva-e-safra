@@ -38,13 +38,13 @@ const BlogCard = ({ post }: Btype) => {
             <div className="overflow-hidden h-[240px]">
               <Image
                 src={coverImg}
-                alt="materialm"
+                alt={title}
                 height={240}
                 width={500}
-                className="w-full"
+                className="h-full w-full object-cover transition-transform duration-300 motion-reduce:transition-none motion-reduce:transform-none"
               />
             </div>
-            <Badge className="absolute bottom-8 end-6 rounded-md bg-white text-black">
+            <Badge className="absolute bottom-8 end-6 rounded-md border border-border bg-card text-card-foreground shadow-sm">
               2 min Read
             </Badge>
           </Link>
@@ -53,7 +53,7 @@ const BlogCard = ({ post }: Btype) => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Avatar className="cursor-pointer w-10 h-10">
+                  <Avatar className="cursor-pointer w-10 h-10" role="img" aria-label={author?.name}>
                     <AvatarImage src={author?.avatar} alt={author?.name} />
                     <AvatarFallback>
                       {author?.name ? author.name[0] : "?"}
@@ -71,7 +71,7 @@ const BlogCard = ({ post }: Btype) => {
             {category}
           </Badge>
 
-          <h5 className="text-xl py-6 group-hover:text-primary">
+          <h5 className="text-xl py-6 group-hover:text-interactive">
             <Link
               href={`/apps/blog/detail/${linkTo}`}
               className="line-clamp-2"
@@ -80,20 +80,20 @@ const BlogCard = ({ post }: Btype) => {
             </Link>
           </h5>
 
-          <div className="flex gap-3">
-            <div className="flex gap-2 items-center text-darklink text-[15px]">
-              <Icon icon="tabler:eye" height="18" className="text-ld" /> {view}
+          <div className="flex flex-wrap gap-3 text-muted-foreground">
+            <div className="flex gap-2 items-center text-[15px]">
+              <Icon icon="tabler:eye" height="18" aria-hidden="true" /> {view}
             </div>
-            <div className="flex gap-2 items-center text-darklink text-[15px]">
+            <div className="flex gap-2 items-center text-[15px]">
               <Icon
                 icon="tabler:message-2"
                 height="18"
-                className="text-ld"
+                aria-hidden="true"
               />{" "}
               {comments?.length}
             </div>
-            <div className="ms-auto flex gap-2 items-center text-darklink text-[15px]">
-              <GoDot size="16" className="text-ld" />
+            <div className="ms-auto flex gap-2 items-center text-[15px] tabular-nums">
+              <GoDot size="16" aria-hidden="true" />
               <small>{format(new Date(createdAt), "E, MMM d")}</small>
             </div>
           </div>

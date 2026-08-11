@@ -9,21 +9,23 @@ export default function Layout({
   children: React.ReactNode
 }>) {
   return (
-    <>
-      <div className='flex w-full min-h-screen'>
-        <div className='page-wrapper flex w-full'>
-          {/* Header/sidebar */}
-          <div className='xl:block hidden'>
-            <Sidebar />
-          </div>
-          <div className='body-wrapper w-full bg-background'>
-            {/* Top Header  */}
-            <Header />
-            {/* Body Content  */}
-            <div className={`container mx-auto px-6 py-30`}>{children}</div>
-          </div>
+    <div className='flex min-h-dvh w-full bg-background'>
+      {/* Header/sidebar */}
+      <div className='hidden xl:block'>
+        <Sidebar />
+      </div>
+      <div className='page-wrapper flex min-h-dvh min-w-0 flex-1'>
+        <div className='body-wrapper flex min-w-0 flex-1 flex-col bg-background'>
+          {/* Top Header */}
+          <Header />
+          {/* Body Content */}
+          <main
+            id='main-content'
+            className='container mx-auto w-full p-4 md:p-6 xl:p-8'>
+            {children}
+          </main>
         </div>
       </div>
-    </>
+    </div>
   )
 }

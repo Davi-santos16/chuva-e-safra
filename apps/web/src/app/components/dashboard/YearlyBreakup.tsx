@@ -2,25 +2,31 @@
 import dynamic from "next/dynamic";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CardBox from "../shared/CardBox";
+import { useTheme } from "next-themes";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 const YearlyBreakup = () => {
+    const { resolvedTheme } = useTheme();
+    const isDark = resolvedTheme === "dark";
 
     const ChartData: any = {
         series: [
             38, 40, 25
         ],
-        color: "#adb5bd",
         labels: ["2023", "2025", "2024"],
         chart: {
             type: "donut",
             fontFamily: "inherit",
-            foreColor: "#adb0bb",
+            foreColor: "var(--muted-foreground)",
+            background: "transparent",
             height: 200,
-            offsetX: 18,
+            parentHeightOffset: 0,
             toolbar: {
                 show: false,
             },
+        },
+        theme: {
+            mode: isDark ? "dark" : "light",
         },
         plotOptions: {
             pie: {
@@ -42,11 +48,11 @@ const YearlyBreakup = () => {
         legend: {
             show: false,
         },
-        colors: ["var(--color-primary)", "var(--color-lightprimary)", "var(--color-secondary)"],
+        colors: ["var(--chart-1)", "var(--chart-3)", "var(--chart-2)"],
 
 
         tooltip: {
-            theme: "dark",
+            theme: isDark ? "dark" : "light",
             fillSeriesColor: false,
             y: {
                 formatter: (val: number) => {
@@ -59,41 +65,45 @@ const YearlyBreakup = () => {
         <>
             <CardBox>
                 <div className="grid grid-cols-12 ">
-                    <div className="flex flex-col lg:col-span-6 md:col-span-6 col-span-7">
+                    <div className="flex flex-col sm:col-span-7 col-span-12">
                         <div>
                             <h5 className="card-title mb-4 lg:whitespace-nowrap">Yearly Breakup</h5>
-                            <h4 className="text-xl mb-2">$36,358</h4>
+                            <h4 className="text-xl mb-2 tabular-nums">$36,358</h4>
                             <div className="flex items-center mb-3 gap-2">
-                                <span className="rounded-full p-1 bg-lightsuccess dark:bg-darksuccess flex items-center justify-center ">
-                                    <Icon icon="tabler:arrow-up-left" className="text-success" />
+                                <span className="rounded-full p-1 bg-success/10 flex items-center justify-center ">
+                                    <Icon icon="tabler:arrow-up-left" className="text-success" aria-hidden="true" />
                                 </span>
-                                <p className="text-dark dark:text-darklink  mb-0">+9%</p>
-                                <p className="dark:text-darklink mb-0 ">last year</p>
+                                <p className="text-foreground mb-0 tabular-nums">+9%</p>
+                                <p className="text-muted-foreground mb-0">last year</p>
                             </div>
                         </div>
-                        <div className="flex flex-wrap gap-4 items-center mt-4">
-                            <div className="flex items-center">
-                                <Icon icon="tabler:point-filled" className="text-primary text-xl me-1" />
-                                <span className="text-xs  dark:text-darklink">2023</span>
-                            </div>
-                            <div className="flex items-center">
-                                <Icon icon="tabler:point-filled" className="text-secondary text-xl me-1" />
-                                <span className="text-xs  dark:text-darklink">2024</span>
-                            </div>
-                            <div className="flex items-center">
-                                <Icon icon="tabler:point-filled" className="text-lightprimary text-xl me-1" />
-                                <span className="text-xs  dark:text-darklink">2025</span>
-                            </div>
-                        </div>
+                        <ul className="flex flex-wrap gap-4 items-center mt-4 text-muted-foreground" aria-label="Yearly Breakup legend">
+                            <li className="flex items-center">
+                                <Icon icon="tabler:point-filled" className="text-chart-1 text-xl me-1" aria-hidden="true" />
+                                <span className="text-xs">2023</span>
+                            </li>
+                            <li className="flex items-center">
+                                <Icon icon="tabler:point-filled" className="text-chart-2 text-xl me-1" aria-hidden="true" />
+                                <span className="text-xs">2024</span>
+                            </li>
+                            <li className="flex items-center">
+                                <Icon icon="tabler:point-filled" className="text-chart-3 text-xl me-1" aria-hidden="true" />
+                                <span className="text-xs">2025</span>
+                            </li>
+                        </ul>
                     </div>
-                    <div className="lg:col-span-6 md:col-span-6 col-span-4">
-                        <div className="flex justify-center">
+                    <div className="sm:col-span-5 col-span-12 min-w-0">
+                        <div
+                            className="flex min-w-0 justify-center"
+                            role="img"
+                            aria-label="Yearly Breakup donut chart: 2023 is 38, 2025 is 40, and 2024 is 25."
+                        >
                             <Chart
                                 options={ChartData}
                                 series={ChartData.series}
                                 type="donut"
                                 height={200}
-                                width={180}
+                                width={140}
                             />
                         </div>
                     </div>

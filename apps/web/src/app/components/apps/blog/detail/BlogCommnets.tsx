@@ -11,7 +11,7 @@ const BlogComment = ({ comment }: BlogType | any) => {
   const [showReply, setShowReply] = useState(false);
   return (
     <>
-      <div className="mt-5 p-5 bg-lightgray dark:bg-darkmuted rounded-md">
+      <div className="mt-5 p-5 bg-muted rounded-lg border border-border">
         <div className="flex gap-3 items-center">
           <Avatar>
             <AvatarImage src={comment?.profile.avatar} alt={comment?.profile.name} />
@@ -20,11 +20,11 @@ const BlogComment = ({ comment }: BlogType | any) => {
             </AvatarFallback>
           </Avatar>
           <h6 className="text-base">{comment?.profile.name}</h6>
-          <span className="h-2 w-2 rounded-full bg-dark opacity-40 dark:bg-white block"></span>
-          <p>{comment?.profile.time}</p>
+          <span className="h-2 w-2 rounded-full bg-muted-foreground opacity-40 block" aria-hidden="true"></span>
+          <p className="text-muted-foreground">{comment?.profile.time}</p>
         </div>
         <div className="py-4">
-          <p className="text-ld">{comment?.comment}</p>
+          <p className="text-foreground">{comment?.comment}</p>
         </div>
         <div className="relative w-fit">
           <TooltipProvider>
@@ -33,8 +33,10 @@ const BlogComment = ({ comment }: BlogType | any) => {
                 <Button
                   className="flex items-center"
                   onClick={() => setShowReply(!showReply)}
+                  aria-label="Reply to comment"
+                  aria-expanded={showReply}
                 >
-                  <Icon icon="tabler:arrow-back-up" height="18" className="!text-white !shrink-0" />
+                  <Icon icon="tabler:arrow-back-up" height="18" className="!text-primary-foreground !shrink-0" aria-hidden="true" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -49,7 +51,7 @@ const BlogComment = ({ comment }: BlogType | any) => {
           {comment?.replies.map((reply: BlogType | any) => {
             return (
               <div className="ps-8" key={reply.comment}>
-                <div className="mt-5 p-5 bg-lightgray dark:bg-darkmuted rounded-md">
+                <div className="mt-5 p-5 bg-muted rounded-lg border border-border">
                   <div className="flex gap-3 items-center">
                     <Avatar>
                       <AvatarImage src={reply.profile.avatar} alt={reply.profile.name} />
@@ -58,11 +60,11 @@ const BlogComment = ({ comment }: BlogType | any) => {
                       </AvatarFallback>
                     </Avatar>
                     <h6 className="text-base">{reply.profile.name}</h6>
-                    <span className="h-2 w-2 rounded-full bg-dark dark:bg-white opacity-40 block"></span>
-                    <p>{comment?.profile.time}</p>
+                    <span className="h-2 w-2 rounded-full bg-muted-foreground opacity-40 block" aria-hidden="true"></span>
+                    <p className="text-muted-foreground">{comment?.profile.time}</p>
                   </div>
                   <div className="py-4">
-                    <p className="text-ld">{reply.comment}</p>
+                    <p className="text-foreground">{reply.comment}</p>
                   </div>
                 </div>
               </div>
@@ -81,7 +83,7 @@ const BlogComment = ({ comment }: BlogType | any) => {
                 </AvatarFallback>
               </Avatar>
             </div>
-            <Input className="form-control md:w-full w-fit" placeholder="Reply" />
+            <Input className="form-control md:w-full w-fit" placeholder="Reply" aria-label="Reply" />
             <Button>Reply</Button>
           </div>
         </div>

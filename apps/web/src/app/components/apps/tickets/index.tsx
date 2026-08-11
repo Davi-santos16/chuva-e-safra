@@ -45,7 +45,7 @@ const TicketsApp = () => {
 
   return (
     <CardBox>
-      <TicketFilter tickets={tickets} setFilter={setFilter} />
+      <TicketFilter tickets={tickets} setFilter={setFilter} filter={filter} />
       <TicketListing
         tickets={tickets}
         filter={filter}

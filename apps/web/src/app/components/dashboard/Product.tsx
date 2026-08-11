@@ -36,8 +36,9 @@ export const Product = ({
         icon="tabler:star-filled"
         className={cn(
           "h-4 w-4",
-          index < rating ? "text-yellow-400" : "text-gray-300"
+          index < rating ? "text-chart-5" : "text-muted-foreground/30"
         )}
+        aria-hidden="true"
       />
     ));
   };
@@ -52,7 +53,7 @@ export const Product = ({
               alt={title}
               height={265}
               width={500}
-              className="w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className="w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:transform-none"
             />
           </div>
         </Link>
@@ -65,9 +66,10 @@ export const Product = ({
                   <Button
                     variant="default"
                     size="icon"
-                    className="rounded-full h-9 w-9 ms-auto bg-primary hover:bg-primary/90"
+                    className="rounded-full h-11 w-11 ms-auto bg-primary hover:bg-primary/90"
+                    aria-label="Add to Cart"
                   >
-                    <Icon icon="tabler:basket" height={18} />
+                    <Icon icon="tabler:basket" height={18} aria-hidden="true" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Add to Cart</TooltipContent>
@@ -75,7 +77,7 @@ export const Product = ({
             </TooltipProvider>
           </div>
 
-          <h6 className="text-base mt-2 line-clamp-1 group-hover:text-primary transition-colors">
+          <h6 className="text-base mt-2 line-clamp-1 group-hover:text-interactive transition-colors">
             {title}
           </h6>
 
@@ -87,7 +89,9 @@ export const Product = ({
               </span>
             </h5>
 
-            <div className="flex items-center gap-0.5">{renderStars(rating)}</div>
+            <div className="flex items-center gap-0.5" aria-label={`${rating} out of 5 stars`}>
+              {renderStars(rating)}
+            </div>
           </div>
         </div>
       </div>

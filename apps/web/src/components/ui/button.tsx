@@ -5,55 +5,65 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:cursor-pointer',
+  'inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-[color,background-color,border-color,box-shadow,opacity] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:brightness-95 disabled:pointer-events-none disabled:opacity-50 aria-busy:pointer-events-none aria-busy:opacity-70 motion-reduce:transition-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-white hover:bg-primaryemphasis',
+        default: 'bg-primary text-primary-foreground hover:bg-primary-hover',
         destructive:
-          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+          'bg-destructive text-destructive-foreground hover:bg-destructive-hover',
         outline:
-          'border border-primary text-primary bg-transparent hover:bg-primary hover:text-white',
+          'border border-interactive bg-transparent text-interactive hover:border-primary hover:bg-primary hover:text-primary-foreground',
         outlinesecondary:
-          'border border-secondary text-secondary bg-transparent hover:bg-secondary hover:text-white',
+          'border border-secondary-foreground bg-transparent text-secondary-foreground hover:bg-secondary',
         outlinesuccess:
-          'border border-success bg-transparent hover:bg-success text-success hover:text-white',
+          'border border-success bg-transparent text-success hover:bg-success hover:text-success-foreground',
         outlinewarning:
-          'border border-warning bg-transparent hover:bg-warning text-warning hover:text-white',
+          'border border-warning bg-transparent text-foreground hover:bg-warning hover:text-warning-foreground',
         outlineinfo:
-          'border border-info bg-transparent hover:bg-info text-info hover:text-white',
+          'border border-info bg-transparent text-info hover:bg-info hover:text-info-foreground',
         outlineerror:
-          'border border-error bg-transparent hover:bg-error text-error hover:text-white',
-        secondary: 'bg-secondary text-white hover:bg-secondaryemphasis',
-        success: 'bg-success text-white hover:bg-successemphasis',
-        warning: 'bg-warning text-white hover:bg-warningemphasis',
-        info: 'bg-info text-white hover:bg-infoemphasis',
-        error: 'bg-error text-white hover:bg-erroremphasis',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        ghostprimary: 'hover:bg-lightprimary hover:text-primary text-primary',
+          'border border-destructive bg-transparent text-destructive hover:bg-destructive hover:text-destructive-foreground',
+        secondary:
+          'bg-secondary text-secondary-foreground hover:bg-secondary-hover',
+        success:
+          'bg-success text-success-foreground hover:bg-success-hover',
+        warning:
+          'bg-warning text-warning-foreground hover:bg-warning-hover',
+        info: 'bg-info text-info-foreground hover:bg-info-hover',
+        error:
+          'bg-destructive text-destructive-foreground hover:bg-destructive-hover',
+        ghost: 'bg-transparent hover:bg-secondary hover:text-secondary-foreground',
+        ghostprimary:
+          'bg-transparent text-interactive hover:bg-secondary hover:text-interactive-hover',
         ghostsecondary:
-          'hover:bg-lightsecondary hover:text-secondary text-secondary',
-        ghostsuccess: 'hover:bg-lightsuccess hover:text-success text-success',
-        ghostwarning: 'hover:bg-lightwarning hover:text-warning text-warning',
-        ghosterror: 'hover:bg-lighterror hover:text-error text-error',
-        ghostinfo: 'hover:bg-lightinfo hover:text-info text-info',
-        link: 'text-primary underline-offset-4 hover:underline',
+          'bg-transparent text-secondary-foreground hover:bg-secondary',
+        ghostsuccess:
+          'bg-transparent text-success hover:bg-success-soft',
+        ghostwarning:
+          'bg-transparent text-foreground hover:bg-warning-soft',
+        ghosterror:
+          'bg-transparent text-destructive hover:bg-destructive-soft',
+        ghostinfo: 'bg-transparent text-info hover:bg-info-soft',
+        link: 'text-interactive underline-offset-4 hover:text-interactive-hover hover:underline',
         lightprimary:
-          'bg-lightprimary text-primary hover:bg-primary hover:text-white',
+          'bg-secondary text-interactive hover:bg-secondary-hover hover:text-interactive-hover',
         lightsecondary:
-          'bg-lightsecondary text-secondary hover:bg-secondary hover:text-white',
+          'bg-secondary text-secondary-foreground hover:bg-secondary-hover',
         lightsuccess:
-          'bg-lightsuccess text-success hover:bg-success hover:text-white',
+          'bg-success-soft text-success hover:bg-success hover:text-success-foreground',
         lightwarning:
-          'bg-lightwarning text-warning hover:bg-warning hover:text-white',
-        lightinfo: 'bg-lightinfo text-info hover:bg-info hover:text-white',
-        lighterror: 'bg-lighterror text-error hover:bg-error hover:text-white',
+          'bg-warning-soft text-foreground hover:bg-warning hover:text-warning-foreground',
+        lightinfo:
+          'bg-info-soft text-info hover:bg-info hover:text-info-foreground',
+        lighterror:
+          'bg-destructive-soft text-destructive hover:bg-destructive hover:text-destructive-foreground',
       },
       size: {
-        default: 'h-10 px-5 py-2',
-        sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md px-8',
-        icon: 'h-10 w-10',
+        default: 'h-11 px-5 py-2',
+        sm: 'h-11 px-3',
+        lg: 'h-12 px-8',
+        icon: 'size-11 p-0',
       },
       shape: {
         pill: 'rounded-full',

@@ -9,6 +9,21 @@ import {
 } from "@/components/ui/table"
 import CardBox from "../shared/CardBox";
 import { Badge } from "@/components/ui/badge";
+import { Icon } from "@iconify/react/dist/iconify.js";
+
+const priorityStyles: Record<string, string> = {
+  Low: "bg-secondary text-secondary-foreground",
+  Medium: "bg-warning-soft text-foreground",
+  High: "bg-destructive-soft text-destructive",
+  Critical: "bg-destructive text-destructive-foreground",
+};
+
+const priorityIcons: Record<string, string> = {
+  Low: "tabler:info-circle",
+  Medium: "tabler:clock",
+  High: "tabler:alert-triangle",
+  Critical: "tabler:alert-octagon",
+};
 
 export const ProductPerformance = () => {
   const PerformersData = [
@@ -18,8 +33,6 @@ export const ProductPerformance = () => {
       designation: "Web Designer",
       project: "Elite Admin",
       priority: "Low",
-      color: "primary",
-      bgcolor: "bg-primary text-white",
       budget: "3.9k"
     },
     {
@@ -28,8 +41,6 @@ export const ProductPerformance = () => {
       designation: "Project Manager",
       project: "Real Homes WP Theme",
       priority: "Medium",
-      color: "secondary",
-      bgcolor: "bg-secondary text-white",
       budget: "24.5k"
     },
     {
@@ -38,8 +49,6 @@ export const ProductPerformance = () => {
       designation: "Project Manager",
       project: "MedicalPro WP Theme",
       priority: "High",
-      color: "error",
-      bgcolor: "bg-error text-white",
       budget: "12.8k"
     },
     {
@@ -48,8 +57,6 @@ export const ProductPerformance = () => {
       designation: "Frontend Engineer",
       project: "Hosting Press HTML",
       priority: "Critical",
-      color: "success",
-      bgcolor: "bg-success text-white",
       budget: "4.8k"
     },
     {
@@ -58,8 +65,6 @@ export const ProductPerformance = () => {
       designation: "Content Writer",
       project: "Helping Hands WP Theme",
       priority: "Low",
-      color: "primary",
-      bgcolor: "bg-primary text-white",
       budget: "9.3k"
     },
   ]
@@ -87,34 +92,35 @@ export const ProductPerformance = () => {
 
                 <TableBody>
                   {PerformersData.map((item, index) => (
-                    <TableRow key={item.key} className="border-b border-defaultBorder">
+                    <TableRow key={item.key} className="border-b border-border hover:bg-primary/5">
                       <TableCell>
-                        <p className="text-charcoal font-medium text-sm">{index + 1}</p>
+                        <p className="text-muted-foreground font-medium text-sm tabular-nums">{index + 1}</p>
                       </TableCell>
 
                       <TableCell className="ps-0 min-w-[200px]">
                         <div>
                           <h6 className="text-sm font-semibold mb-1">{item.username}</h6>
-                          <p className="text-xs font-medium text-slateGray">{item.designation}</p>
+                          <p className="text-xs font-medium text-muted-foreground">{item.designation}</p>
                         </div>
                       </TableCell>
 
                       <TableCell>
-                        <p className="text-bodytext font-medium dark:text-darklink text-sm">
+                        <p className="text-muted-foreground font-medium text-sm">
                           {item.project}
                         </p>
                       </TableCell>
 
                       <TableCell>
                         <Badge
-                          className={`text-[13px] px-3 rounded-full justify-center py-0.5 ${item.bgcolor}`}
+                          className={`gap-1.5 border-0 px-3 py-1 text-[13px] ${priorityStyles[item.priority]}`}
                         >
+                          <Icon icon={priorityIcons[item.priority]} aria-hidden="true" />
                           {item.priority}
                         </Badge>
                       </TableCell>
 
                       <TableCell>
-                        <p className="dark:text-darklink text-link text-[15px] font-medium">
+                        <p className="text-foreground text-[15px] font-medium tabular-nums">
                           {item.budget}
                         </p>
                       </TableCell>
