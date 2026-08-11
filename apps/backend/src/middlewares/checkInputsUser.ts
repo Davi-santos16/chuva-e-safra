@@ -19,7 +19,11 @@ const userSchema = z.object({
         message: 'Role inválida'
     }),
 
-    municipio: z.string(),
+    municipio: z.string()
+        .trim()
+        .regex(/^23\d{5}$/, 'Município deve ser um código IBGE do Ceará')
+        .optional(),
+    uf: z.string().trim().length(2, 'UF deve ter 2 caracteres').toUpperCase().optional(),
 });
 
 export const checkInputsUser = (req: Request, res: Response, next: NextFunction) => {

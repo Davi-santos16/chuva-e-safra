@@ -3,5 +3,6 @@ export interface IUser {
   email: string;
   password: string;
   role: 'PRODUTOR' | 'TECNICO_COOPERATIVA' | 'GESTOR_PUBLICO';
-  municipio: string;
+  municipio?: string;
+  uf?: string;
 }
