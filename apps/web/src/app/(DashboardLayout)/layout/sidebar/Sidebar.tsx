@@ -5,7 +5,6 @@ import SidebarContent from './Sidebaritems'
 import SimpleBar from 'simplebar-react'
 import { Icon } from '@iconify/react'
 import FullLogo from '../shared/logo/FullLogo'
-import { Button } from '@/components/ui/button'
 import {
   AMLogo,
   AMMenu,
@@ -131,20 +130,6 @@ const SidebarLayout = ({ onClose }: { onClose?: () => void }) => {
             </div>
           ))}
 
-          {/* Promo Section */}
-          <div className='mt-9 overflow-hidden'>
-            <div className='flex w-full rounded-xl border border-sidebar-foreground/10 bg-sidebar-foreground/10 p-6'>
-              <div className='w-1/2'>
-                <h5 className='text-base text-sidebar-foreground'>Haven't Account?</h5>
-                <Button asChild>
-                  <Link href='/auth/register' className='mt-2 whitespace-nowrap text-[13px]'>Sign up</Link>
-                </Button>
-              </div>
-              <div className='flex w-1/2 shrink-0 items-center justify-end'>
-                <FullLogo compact surface='dark' className='w-16' />
-              </div>
-            </div>
-          </div>
         </div>
       </SimpleBar>
     </AMSidebar>

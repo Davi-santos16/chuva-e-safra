@@ -5,10 +5,8 @@ import { useTheme } from 'next-themes'
 import { Icon } from '@iconify/react'
 import Link from 'next/link'
 import Profile from './Profile'
-import Notifications from './Notifications'
 import SidebarLayout from '../sidebar/Sidebar'
 import FullLogo from '../shared/logo/FullLogo'
-import { Input } from '@/components/ui/input'
 import {
   Sheet,
   SheetClose,
@@ -95,32 +93,11 @@ const Header = () => {
               )}
             </button>
 
-            <Notifications />
-
             {/* Profile Dropdown */}
             <Profile />
           </div>
 
           <div className='hidden w-full items-center justify-between xl:flex'>
-            <div className='flex items-center gap-2'>
-              {/* Search Icon */}
-
-              <div className='relative w-64'>
-                <Icon
-                  icon='solar:magnifer-linear'
-                  width={18}
-                  height={18}
-                  aria-hidden='true'
-                  className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground'
-                />
-                <Input
-                  type='text'
-                  aria-label='Pesquisar'
-                  placeholder='Search...'
-                  className='h-11 rounded-xl pl-10'
-                />
-              </div>
-            </div>
             <div className='flex w-full items-center justify-end'>
               <div className='flex items-center'>
                 {/* ✅ Dark/Light Toggle */}
@@ -140,8 +117,6 @@ const Header = () => {
                     <Icon icon='tabler:moon' width='20' aria-hidden='true' />
                   )}
                 </button>
-
-                <Notifications />
 
                 {/* Profile Dropdown */}
                 <Profile />

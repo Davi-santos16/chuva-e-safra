@@ -26,35 +26,6 @@ const sidebarContent: MenuItem[] = [
     ],
   },
   {
-    heading: 'Aplicativos',
-    children: [
-      {
-        id: 'notas',
-        name: 'Notas',
-        icon: 'solar:notes-linear',
-        url: '/apps/notes',
-      },
-      {
-        id: 'tickets',
-        name: 'Tickets',
-        icon: 'solar:ticker-star-linear',
-        url: '/apps/tickets',
-      },
-      {
-        id: 'blog',
-        name: 'Blog',
-        icon: 'solar:sort-by-alphabet-linear',
-        children: [
-          {
-            id: 'blog-posts',
-            name: 'Publicações',
-            url: '/apps/blog/post',
-          },
-        ],
-      },
-    ],
-  },
-  {
     heading: 'Exemplos',
     children: [
       {
