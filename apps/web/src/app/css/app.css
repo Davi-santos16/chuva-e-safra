@@ -11,8 +11,3 @@
   transform: scale(1.09);
   transition: transform .2s;
 }
-
-.mySwiper .swiper-wrapper {
-    transition-timing-function: linear !important;
-    margin: 0 auto !important;
-}

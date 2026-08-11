@@ -94,7 +94,7 @@ class AnalisesController {
     }
 
     if (user.role === "GESTOR_PUBLICO") {
-      const uf = user.uf 
+      const uf = user.uf
 
       if (uf !== "CE") {
         throw new AppError("A UF do gestor deve ser CE.");

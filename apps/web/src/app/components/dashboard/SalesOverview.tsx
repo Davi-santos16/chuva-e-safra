@@ -77,7 +77,7 @@ const SalesOverview = () => {
             }
         },
         tooltip: {
-            theme: "dark",
+            theme: "dark" as const,
             y: {
                 formatter: (val: number) => {
                     return `${val}k`;

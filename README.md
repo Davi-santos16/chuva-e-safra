@@ -4,7 +4,7 @@ Aplicação web organizada como um **monorepo**, com frontend e backend no mesmo
 
 ## Tecnologias
 
-- **Frontend:** React, TypeScript e Vite
+- **Frontend:** Next.js, React, TypeScript e Tailwind CSS
 - **Backend:** Node.js, Express e TypeScript
 - **Banco de dados:** PostgreSQL com Prisma ORM
 - **Gerenciador de pacotes:** npm workspaces
@@ -14,7 +14,7 @@ Aplicação web organizada como um **monorepo**, com frontend e backend no mesmo
 ```text
 chuva-e-safra/
 ├── apps/
-│   ├── frontend/     # Interface React
+│   ├── web/          # Aplicação web em Next.js
 │   └── backend/      # API Express e configuração do Prisma
 ├── package.json      # Comandos e workspaces do projeto
 └── package-lock.json # Versões das dependências
@@ -45,7 +45,7 @@ Pela raiz, indicando o workspace:
 
 ```bash
 # Biblioteca usada no frontend
-npm install nome-do-pacote -w frontend
+npm install nome-do-pacote -w web
 
 # Biblioteca usada no backend
 npm install nome-do-pacote -w backend
@@ -58,7 +58,7 @@ Ou entrando na pasta da aplicação correta:
 
 ```bash
 # Frontend (partindo da raiz)
-cd apps/frontend
+cd apps/web
 npm install nome-do-pacote
 cd ../..
 
@@ -117,13 +117,13 @@ npm run dev
 
 Esse comando inicia as duas aplicações ao mesmo tempo:
 
-- Frontend: `http://localhost:5173`
+- Frontend: `http://localhost:3000`
 - Backend: `http://localhost:3333`
 
 Também é possível iniciar cada parte separadamente, sempre pela raiz:
 
 ```bash
-npm run dev:frontend
+npm run dev:web
 npm run dev:backend
 ```
 
@@ -140,6 +140,6 @@ o token; o prefixo `Bearer` é adicionado automaticamente.
 
 ## Como o projeto funciona
 
-O frontend, localizado em `apps/frontend`, contém a interface exibida no navegador. O backend, em `apps/backend`, disponibiliza a API e acessa o PostgreSQL por meio do Prisma. Os modelos e migrations do banco ficam em `apps/backend/prisma`.
+O frontend, localizado em `apps/web`, contém a interface e as rotas do Next.js. O backend, em `apps/backend`, disponibiliza a API e acessa o PostgreSQL por meio do Prisma. Os modelos e migrations do banco ficam em `apps/backend/prisma`.
 
-No estado atual, o frontend possui a tela inicial do Vite e o backend inicia o servidor Express na porta `3333`. As funcionalidades e rotas da aplicação ainda podem ser adicionadas sobre essa estrutura.
+O backend inicia o servidor Express na porta `3333` e atualmente disponibiliza o cadastro de usuários em `POST /auth/register`.
