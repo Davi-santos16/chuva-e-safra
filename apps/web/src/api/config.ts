@@ -1,4 +1,5 @@
 import axios from "axios"
+import { AUTH_TOKEN_KEY } from "@/lib/auth/token"
 
 export const api = axios.create({
   baseURL:
@@ -11,7 +12,7 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("authToken")
+    const token = localStorage.getItem(AUTH_TOKEN_KEY)
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`

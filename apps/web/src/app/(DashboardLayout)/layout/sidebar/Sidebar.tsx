@@ -13,6 +13,8 @@ import {
   AMSubmenu,
 } from 'tailwind-sidebar'
 import 'tailwind-sidebar/styles.css'
+import { useAuth } from '@/hooks/use-auth'
+import { HOME_BY_ROLE } from '@/lib/auth/types'
 
 const renderSidebarItems = (
   items: any[],
@@ -87,6 +89,7 @@ const renderSidebarItems = (
 const SidebarLayout = ({ onClose }: { onClose?: () => void }) => {
   const pathname = usePathname()
   const { resolvedTheme } = useTheme()
+  const { role } = useAuth()
   const isMobile = Boolean(onClose)
 
   // Only allow "light" or "dark" for AMSidebar
@@ -117,18 +120,25 @@ const SidebarLayout = ({ onClose }: { onClose?: () => void }) => {
 
       <SimpleBar className='h-[calc(100dvh-72px)]'>
         <div className='px-6 py-4'>
-          {SidebarContent.map((section, index) => (
+          {SidebarContent.map((section, index) => {
+            const children = (section.children || [])
+              .filter((item) => !item.allowedRoles || Boolean(role && item.allowedRoles.includes(role)))
+              .map((item) => item.id === 'dashboard' && role ? { ...item, url: HOME_BY_ROLE[role] } : item)
+
+            if (!children.length) return null
+
+            return (
             <div key={index}>
               {renderSidebarItems(
                 [
                   ...(section.heading ? [{ heading: section.heading }] : []),
-                  ...(section.children || []),
+                  ...children,
                 ],
                 pathname,
                 onClose
               )}
             </div>
-          ))}
+          )})}
 
         </div>
       </SimpleBar>

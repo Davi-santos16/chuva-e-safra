@@ -6,6 +6,8 @@ import { Icon } from '@iconify/react'
 import * as profileData from './Data'
 import SimpleBar from 'simplebar-react'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/hooks/use-auth'
+import { useRouter } from 'next/navigation'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +17,14 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 const Profile = () => {
+  const { logout } = useAuth()
+  const router = useRouter()
+
+  const handleLogout = () => {
+    logout()
+    router.replace('/login')
+  }
+
   return (
     <div className='group/menu relative shrink-0'>
       <DropdownMenu>
@@ -61,8 +71,8 @@ const Profile = () => {
           <DropdownMenuSeparator className='my-1' />
 
           <div className='px-3'>
-            <Button variant='outline' asChild className='w-full rounded-md'>
-              <Link href='/login'>Logout</Link>
+            <Button variant='outline' className='w-full rounded-md' onClick={handleLogout}>
+              Logout
             </Button>
           </div>
         </DropdownMenuContent>

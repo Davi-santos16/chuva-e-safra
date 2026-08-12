@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Inter, Sora } from 'next/font/google'
 import './css/globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
+import { AuthProvider } from '@/contexts/auth-context'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -43,7 +44,7 @@ export default function RootLayout({
           defaultTheme='system'
           enableSystem
           disableTransitionOnChange>
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
       </body>
     </html>
