@@ -1,0 +1,3 @@
+import Link from "next/link";
+import FullLogo from "@/app/(DashboardLayout)/layout/shared/logo/FullLogo";
+export function AccessShell({ children }: { children: React.ReactNode }) { return <main className="min-h-dvh bg-background"><header className="border-b border-border bg-background"><div className="mx-auto flex min-h-[76px] max-w-6xl items-center justify-between px-4 sm:px-6"><Link href="/"><FullLogo className="w-[164px]" priority /></Link><Link href="/acompanhar-solicitacao" className="rounded-md text-sm font-semibold text-interactive underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring">Acompanhar solicitação</Link></div></header>{children}</main> }
