@@ -7,12 +7,12 @@ import FullLogo from '../logo/FullLogo'
 
 interface BreadCrumbType {
   subtitle?: string
-  items?: any[]
+  items?: unknown[]
   title: string
   children?: JSX.Element
 }
 
-const BreadcrumbComp = ({ items, title }: BreadCrumbType) => {
+const BreadcrumbComp = ({ title }: BreadCrumbType) => {
   return (
     <>
       <CardBox

@@ -62,7 +62,7 @@ const Profile = () => {
 
           <div className='px-3'>
             <Button variant='outline' asChild className='w-full rounded-md'>
-              <Link href='/auth/login'>Logout</Link>
+              <Link href='/login'>Logout</Link>
             </Button>
           </div>
         </DropdownMenuContent>
