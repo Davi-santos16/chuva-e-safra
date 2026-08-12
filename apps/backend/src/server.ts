@@ -7,11 +7,12 @@ import { errorHandling } from "./middlewares/error-handling";
 
 
 const app = express();
-const PORT = 3333;
+const PORT = process.env.PORT;
 
 
 app.use(cors())
 app.use(express.json());
+
 
 
 app.get("/docs.json", (_request, response) => {
