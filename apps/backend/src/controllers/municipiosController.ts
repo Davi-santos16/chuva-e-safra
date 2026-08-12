@@ -4,6 +4,20 @@ import { prisma } from "@/database/prisma";
 import { AppError } from "@/utils/AppError";
 
 class MunicipiosController {
+  async todos(_request: Request, response: Response) {
+    const municipios = await prisma.municipio.findMany({
+      select: {
+        id: true,
+        nome: true,
+        regiaoImediataId: true,
+        regiaoImediataNome: true,
+      },
+      orderBy: { nome: "asc" },
+    });
+
+    return response.status(200).json({ municipios });
+  }
+
   async regioesImediatas(_request: Request, response: Response) {
     const regioes = await prisma.municipio.findMany({
       distinct: ["regiaoImediataId"],

@@ -199,6 +199,37 @@ Selecione abaixo o schema correspondente ao tipo de usuário para ver apenas os 
         },
       },
     },
+    "/municipios/todos": {
+      get: {
+        tags: ["Municípios"],
+        summary: "Listar todos os municípios",
+        description:
+          "Rota pública que retorna todos os municípios do Ceará, em ordem alfabética, com a respectiva região imediata.",
+        operationId: "getAllMunicipalities",
+        responses: {
+          "200": {
+            description: "Todos os municípios do Ceará cadastrados.",
+            content: {
+              "application/json": {
+                example: {
+                  municipios: [
+                    {
+                      id: 2300101,
+                      nome: "Abaiara",
+                      regiaoImediataId: 230011,
+                      regiaoImediataNome: "Brejo Santo",
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "500": {
+            $ref: "#/components/responses/InternalServerError",
+          },
+        },
+      },
+    },
     "/municipios": {
       get: {
         tags: ["Municípios"],

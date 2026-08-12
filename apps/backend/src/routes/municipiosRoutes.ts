@@ -11,6 +11,8 @@ municipiosRoutes.get(
   municipiosController.regioesImediatas,
 );
 
+municipiosRoutes.get("/todos", municipiosController.todos);
+
 municipiosRoutes.get(
   "/",
   ensureAuthenticated,

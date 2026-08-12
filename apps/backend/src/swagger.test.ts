@@ -8,8 +8,16 @@ test("documenta todas as rotas públicas do backend", () => {
   assert.ok(swaggerDocument.paths["/auth/register"].post);
   assert.ok(swaggerDocument.paths["/auth/login"].post);
   assert.ok(swaggerDocument.paths["/municipios/regioes-imediatas"].get);
+  assert.ok(swaggerDocument.paths["/municipios/todos"].get);
   assert.ok(swaggerDocument.paths["/municipios"].get);
   assert.ok(swaggerDocument.paths["/analises"].get);
+});
+
+test("mantém pública a listagem de todos os municípios", () => {
+  assert.equal(
+    "security" in swaggerDocument.paths["/municipios/todos"].get,
+    false,
+  );
 });
 
 test("protege a listagem de municípios do técnico", () => {
