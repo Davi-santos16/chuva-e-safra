@@ -23,7 +23,19 @@ const userSchema = z.object({
         .trim()
         .regex(/^23\d{5}$/, 'Município deve ser um código IBGE do Ceará')
         .optional(),
+    regiaoImediataId: z.coerce.number()
+        .int('Região imediata deve ser um código inteiro')
+        .positive('Região imediata deve ser um código positivo')
+        .optional(),
     uf: z.string().trim().length(2, 'UF deve ter 2 caracteres').toUpperCase().optional(),
+}).superRefine((data, context) => {
+    if (data.role === 'TECNICO_COOPERATIVA' && data.regiaoImediataId === undefined) {
+        context.addIssue({
+            code: 'custom',
+            path: ['regiaoImediataId'],
+            message: 'Região imediata é obrigatória para técnico',
+        });
+    }
 });
 
 export const checkInputsUser = (req: Request, res: Response, next: NextFunction) => {
