@@ -1,3 +1,5 @@
+import type { UserRole } from '@/lib/auth/types'
+
 export interface MenuItem {
   heading?: string
   name?: string
@@ -5,6 +7,7 @@ export interface MenuItem {
   id?: string
   url?: string
   children?: MenuItem[]
+  allowedRoles?: UserRole[]
 }
 
 const sidebarContent: MenuItem[] = [

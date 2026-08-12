@@ -2,6 +2,8 @@
 
 import Header from './layout/header/Header'
 import Sidebar from './layout/sidebar/Sidebar'
+import { RouteGuard } from '@/components/auth/route-guard'
+import { ALL_AUTHENTICATED_ROLES } from '@/lib/auth/types'
 
 export default function Layout({
   children,
@@ -9,6 +11,7 @@ export default function Layout({
   children: React.ReactNode
 }>) {
   return (
+    <RouteGuard allowedRoles={ALL_AUTHENTICATED_ROLES}>
     <div className='flex min-h-dvh w-full bg-background'>
       {/* Header/sidebar */}
       <div className='hidden xl:block'>
@@ -27,5 +30,6 @@ export default function Layout({
         </div>
       </div>
     </div>
+    </RouteGuard>
   )
 }
