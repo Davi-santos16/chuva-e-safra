@@ -38,6 +38,16 @@ function normalizarMunicipios(municipios: string) {
   return codigos.join(",");
 }
 
+function codigosMunicipios(municipios: string) {
+  return [
+    ...new Set(
+      normalizarMunicipios(municipios)
+        .split(",")
+        .map(Number),
+    ),
+  ];
+}
+
 class AnalisesController {
   async index(request: Request, response: Response) {
     const querySchema = z.object({
@@ -62,6 +72,7 @@ class AnalisesController {
       select: {
         role: true,
         municipio: true,
+        regiaoImediataId: true,
         uf: true,
       },
     });
@@ -90,7 +101,27 @@ class AnalisesController {
         throw new AppError("Municípios são obrigatórios para técnico.");
       }
 
-      params.municipios = normalizarMunicipios(municipios);
+      if (!user.regiaoImediataId) {
+        throw new AppError("Técnico não possui região imediata cadastrada.");
+      }
+
+      const codigos = codigosMunicipios(municipios);
+      const municipiosPermitidos = await prisma.municipio.findMany({
+        where: {
+          id: { in: codigos },
+          regiaoImediataId: user.regiaoImediataId,
+        },
+        select: { id: true },
+      });
+
+      if (municipiosPermitidos.length !== codigos.length) {
+        throw new AppError(
+          "Um ou mais municípios não pertencem à região imediata do técnico.",
+          403,
+        );
+      }
+
+      params.municipios = codigos.join(",");
     }
 
     if (user.role === "GESTOR_PUBLICO") {

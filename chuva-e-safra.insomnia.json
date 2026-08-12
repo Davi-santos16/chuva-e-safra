@@ -27,7 +27,7 @@
         "email_tecnico": "tecnico@teste.local",
         "email_gestor": "gestor@teste.local",
         "municipio_produtor": "2304400",
-        "municipios_tecnico": "2304400,2303709",
+        "municipios_tecnico": "2300754,2306405",
         "cultura": "MILHO",
         "ano_inicial": 2020,
         "ano_final": 2024,
@@ -119,7 +119,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"name\": \"Técnico Teste\",\n  \"email\": \"{{ _.email_tecnico }}\",\n  \"password\": \"{{ _.senha }}\",\n  \"role\": \"TECNICO_COOPERATIVA\"\n}"
+        "text": "{\n  \"name\": \"Técnico Teste\",\n  \"email\": \"{{ _.email_tecnico }}\",\n  \"password\": \"{{ _.senha }}\",\n  \"role\": \"TECNICO_COOPERATIVA\",\n  \"regiaoImediataId\": 230002\n}"
       },
       "parameters": [],
       "headers": [{ "name": "Content-Type", "value": "application/json" }],
@@ -319,7 +319,7 @@
         { "id": "pair_tec_cultura", "name": "cultura", "value": "{{ _.cultura }}", "description": "Cultura agrícola", "disabled": false },
         { "id": "pair_tec_de", "name": "de", "value": "{{ _.ano_inicial }}", "description": "Ano inicial", "disabled": false },
         { "id": "pair_tec_ate", "name": "ate", "value": "{{ _.ano_final }}", "description": "Ano final", "disabled": false },
-        { "id": "pair_tec_mun", "name": "municipios", "value": "{{ _.municipios_tecnico }}", "description": "Códigos IBGE separados por vírgula", "disabled": false }
+        { "id": "pair_tec_mun", "name": "municipios", "value": "{{ _.municipios_tecnico }}", "description": "Códigos IBGE da região 230002 separados por vírgula", "disabled": false }
       ],
       "headers": [],
       "authentication": { "type": "bearer", "token": "{{ _.token_tecnico }}", "disabled": false },

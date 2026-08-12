@@ -25,6 +25,21 @@ export class UserController {
                 throw new AppError('Email já está em uso', 409);
             }
 
+            if (data.role === 'TECNICO_COOPERATIVA') {
+                if (data.regiaoImediataId === undefined) {
+                    throw new AppError('Região imediata é obrigatória para técnico');
+                }
+
+                const regiaoExiste = await prisma.municipio.findFirst({
+                    where: { regiaoImediataId: data.regiaoImediataId },
+                    select: { id: true },
+                });
+
+                if (!regiaoExiste) {
+                    throw new AppError('Região imediata não encontrada no Ceará');
+                }
+            }
+
             // CRIPTOGRAFANDO A SENHA
             const hashedPassword = await bcrypt.hash(data.password, 10);
 
@@ -36,6 +51,9 @@ export class UserController {
                     password: hashedPassword,
                     role: data.role,
                     municipio: data.role === 'PRODUTOR' ? data.municipio : null,
+                    regiaoImediataId: data.role === 'TECNICO_COOPERATIVA'
+                        ? data.regiaoImediataId
+                        : null,
                     uf: data.role === 'GESTOR_PUBLICO' ? 'CE' : null,
                 }
             });

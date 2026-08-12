@@ -44,6 +44,7 @@ test("cria uma sessão e inclui id e perfil no JWT", async () => {
     password: passwordHash,
     role: "TECNICO_COOPERATIVA",
     municipio: null,
+    regiaoImediataId: 230002,
     uf: null,
     createdAT: new Date(),
     updatedAT: null,
@@ -100,15 +101,19 @@ test("autentica um Bearer token válido e rejeita token inválido", () => {
 
 test("monta os filtros de análise conforme o perfil", async () => {
   const originalFindUnique = prisma.user.findUnique;
+  const originalMunicipioFindMany = prisma.municipio.findMany;
   const originalApiGet = api.get;
   let currentUser: {
     role: "PRODUTOR" | "TECNICO_COOPERATIVA" | "GESTOR_PUBLICO";
     municipio: string | null;
+    regiaoImediataId: number | null;
     uf: string | null;
   };
   let capturedParams: Record<string, unknown> = {};
 
   prisma.user.findUnique = (async () => currentUser) as unknown as typeof prisma.user.findUnique;
+  prisma.municipio.findMany = (async ({ where }: { where?: { id?: { in?: number[] } } }) =>
+    (where?.id?.in ?? []).map((id) => ({ id }))) as unknown as typeof prisma.municipio.findMany;
   api.get = (async (_url: string, config?: { params?: Record<string, unknown> }) => {
     capturedParams = config?.params ?? {};
     return { data: { ok: true } };
@@ -121,7 +126,12 @@ test("monta os filtros de análise conforme o perfil", async () => {
   };
 
   try {
-    currentUser = { role: "PRODUTOR", municipio: "2304400", uf: null };
+    currentUser = {
+      role: "PRODUTOR",
+      municipio: "2304400",
+      regiaoImediataId: null,
+      uf: null,
+    };
     await controller.index(
       baseRequest as unknown as Request,
       responseMock() as unknown as Response,
@@ -134,11 +144,16 @@ test("monta os filtros de análise conforme o perfil", async () => {
       municipios: "2304400",
     });
 
-    currentUser = { role: "TECNICO_COOPERATIVA", municipio: null, uf: null };
+    currentUser = {
+      role: "TECNICO_COOPERATIVA",
+      municipio: null,
+      regiaoImediataId: 230002,
+      uf: null,
+    };
     await controller.index(
       {
         ...baseRequest,
-        query: { ...baseRequest.query, municipios: "2304400, 2307304" },
+        query: { ...baseRequest.query, municipios: "2300754, 2306405" },
       } as unknown as Request,
       responseMock() as unknown as Response,
     );
@@ -147,10 +162,15 @@ test("monta os filtros de análise conforme o perfil", async () => {
       cultura: "milho",
       de: 2020,
       ate: 2025,
-      municipios: "2304400,2307304",
+      municipios: "2300754,2306405",
     });
 
-    currentUser = { role: "GESTOR_PUBLICO", municipio: null, uf: "CE" };
+    currentUser = {
+      role: "GESTOR_PUBLICO",
+      municipio: null,
+      regiaoImediataId: null,
+      uf: "CE",
+    };
     await controller.index(
       baseRequest as unknown as Request,
       responseMock() as unknown as Response,
@@ -164,6 +184,7 @@ test("monta os filtros de análise conforme o perfil", async () => {
     });
   } finally {
     prisma.user.findUnique = originalFindUnique;
+    prisma.municipio.findMany = originalMunicipioFindMany;
     api.get = originalApiGet;
   }
 });

@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client"
-  output   =  "../prisma/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../prisma/generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -13,21 +13,31 @@ enum UserRole {
   TECNICO_COOPERATIVA
   GESTOR_PUBLICO
 }
-  
+
+model Municipio {
+  id                 Int    @id
+  nome               String
+  regiaoImediataId   Int    @map("regiao_imediata_id")
+  regiaoImediataNome String @map("regiao_imediata_nome")
+
+  @@index([nome])
+  @@index([regiaoImediataId])
+  @@map("municipios")
+}
 
 model User {
-  id  String @id @default(uuid())
-  name String
-  email String @unique
-  password String
-  role UserRole
-  municipio  String?
-  uf String?
-  
+  id               String   @id @default(uuid())
+  name             String
+  email            String   @unique
+  password         String
+  role             UserRole
+  municipio        String?
+  regiaoImediataId Int?     @map("regiao_imediata_id")
+  uf               String?
 
-  createdAT DateTime @default(now()) @map("created_at")
+  createdAT DateTime  @default(now()) @map("created_at")
   updatedAT DateTime? @updatedAt @map("updated_at")
-  
 
+  @@index([regiaoImediataId])
   @@map("users")
 }
