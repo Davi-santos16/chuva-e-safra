@@ -11,6 +11,8 @@ import { AnalisesController } from "@/controllers/analisesController";
 import { SessionsController } from "@/controllers/sessionsController";
 import { prisma } from "@/database/prisma";
 import { ensureAuthenticated } from "@/middlewares/ensureAuthenticated";
+import { checkInputsUser } from "@/middlewares/checkInputsUser";
+import { verifyUserAuthorization } from "@/middlewares/verifyUserAuthorization";
 
 const jwtSecret = "segredo-usado-apenas-nos-testes";
 authConfig.jwt.secret = jwtSecret;
@@ -97,6 +99,44 @@ test("autentica um Bearer token válido e rejeita token inválido", () => {
       ),
     (error: { statusCode?: number }) => error.statusCode === 401,
   );
+});
+
+test("reconhece ADMIN no JWT e protege o provisionamento administrativo", () => {
+  const token = sign({ role: "ADMIN" }, jwtSecret, { subject: "admin-123" });
+  const request = { headers: { authorization: `Bearer ${token}` } } as Request;
+
+  ensureAuthenticated(request, {} as Response, () => undefined);
+  assert.equal(request.user?.role, "ADMIN");
+
+  assert.doesNotThrow(() =>
+    verifyUserAuthorization(["ADMIN"])(request, {} as Response, () => undefined),
+  );
+  assert.throws(
+    () =>
+      verifyUserAuthorization(["ADMIN"])(
+        { user: { id: "gestor-123", role: "GESTOR_PUBLICO" } } as Request,
+        {} as Response,
+        () => undefined,
+      ),
+    (error: { statusCode?: number }) => error.statusCode === 403,
+  );
+
+  let validationError: unknown;
+  checkInputsUser(
+    {
+      body: {
+        name: "Administrador",
+        email: "admin@example.com",
+        password: "senha123",
+        role: "ADMIN",
+      },
+    } as Request,
+    {} as Response,
+    (error?: unknown) => {
+      validationError = error;
+    },
+  );
+  assert.ok(validationError, "ADMIN não deve ser aceito no cadastro público");
 });
 
 test("monta os filtros de análise conforme o perfil", async () => {

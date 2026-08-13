@@ -80,6 +80,9 @@ DIRECT_URL="postgresql://...URL-direta-do-Supabase..."
 API_DADOS_URL="https://...URL-da-API-de-dados..."
 JWT_SECRET="...chave-longa-e-aleatoria..."
 JWT_EXPIRES_IN="1d"
+ADMIN_NAME="Administrador"
+ADMIN_EMAIL="admin@example.com"
+ADMIN_PASSWORD="...senha-inicial-com-8-ou-mais-caracteres..."
 ```
 
 - `DATABASE_URL` é usada pela aplicação e deve apontar para a conexão com pool do Supabase.
@@ -87,6 +90,7 @@ JWT_EXPIRES_IN="1d"
 - `API_DADOS_URL` é a URL base da API externa de análises.
 - `JWT_SECRET` assina e valida os tokens de autenticação e deve ser mantida em segredo.
 - `JWT_EXPIRES_IN` define a validade do token; quando omitida, a aplicação usa `1d`.
+- `ADMIN_EMAIL` e `ADMIN_PASSWORD` provisionam o primeiro administrador durante a seed. `ADMIN_NAME` é opcional.
 - Não envie o arquivo `.env` para o repositório.
 
 Com as variáveis configuradas, gere o Prisma Client:
@@ -98,6 +102,16 @@ cd ../..
 ```
 
 O comando deve ser executado em `apps/backend`, onde estão `prisma.config.ts` e a pasta `prisma`. Ele gera o código usado pela aplicação, mas não altera o banco de dados.
+
+Para provisionar o primeiro administrador depois de configurar as variáveis acima:
+
+```bash
+cd apps/backend
+npx prisma db seed
+cd ../..
+```
+
+O cadastro público não aceita o perfil `ADMIN`. Depois do primeiro acesso, novos administradores podem ser criados na área protegida `/admin/dashboard`.
 
 ### Migrations e banco de produção
 

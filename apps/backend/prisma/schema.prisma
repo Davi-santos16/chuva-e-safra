@@ -12,6 +12,7 @@ enum UserRole {
   PRODUTOR
   TECNICO_COOPERATIVA
   GESTOR_PUBLICO
+  ADMIN
 }
 
 model Municipio {

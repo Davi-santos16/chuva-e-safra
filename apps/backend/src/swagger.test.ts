@@ -11,6 +11,8 @@ test("documenta todas as rotas públicas do backend", () => {
   assert.ok(swaggerDocument.paths["/municipios/todos"].get);
   assert.ok(swaggerDocument.paths["/municipios"].get);
   assert.ok(swaggerDocument.paths["/analises"].get);
+  assert.ok(swaggerDocument.paths["/admin/users"].get);
+  assert.ok(swaggerDocument.paths["/admin/users"].post);
 });
 
 test("mantém pública a listagem de todos os municípios", () => {
@@ -69,4 +71,15 @@ test("documenta autenticação JWT na rota de análises", () => {
     swaggerDocument.components.securitySchemes.bearerAuth.scheme,
     "bearer",
   );
+});
+
+test("protege a gestão de usuários e não expõe ADMIN no cadastro público", () => {
+  assert.deepEqual(swaggerDocument.paths["/admin/users"].get.security, [
+    { bearerAuth: [] },
+  ]);
+  assert.deepEqual(swaggerDocument.paths["/admin/users"].post.security, [
+    { bearerAuth: [] },
+  ]);
+  assert.equal(swaggerDocument.components.schemas.RegisterRequest.oneOf.length, 3);
+  assert.ok(swaggerDocument.components.schemas.UserRole.enum.includes("ADMIN"));
 });
