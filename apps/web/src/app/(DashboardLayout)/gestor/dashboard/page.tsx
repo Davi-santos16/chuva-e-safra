@@ -1,9 +1,5 @@
-import { ProfilePlaceholder } from "@/app/components/dashboard/ProfilePlaceholder";
-export default function Page() {
-  return (
-    <ProfilePlaceholder
-      title="Gestor público"
-      icon="solar:buildings-2-linear"
-    />
-  );
+import { ManagerAnalyses } from "@/app/components/dashboard/AgriculturalAnalyses";
+
+export default function ManagerDashboardPage() {
+  return <ManagerAnalyses />;
 }
