@@ -1,22 +1,45 @@
-import { api } from "@/api/config"
+import { api } from "@/api/config";
 
+export interface Municipality {
+  id: number;
+  nome: string;
+}
+
+interface MunicipalitiesResponse {
+  municipios: Municipality[];
+}
+
+export interface ImmediateRegion {
+  regiaoImediataId: number;
+  regiaoImediataNome: string;
+}
+
+interface ImmediateRegionsResponse {
+  regioes: ImmediateRegion[];
+}
+
+export async function getAllMunicipalities() {
+  const response = await api.get<MunicipalitiesResponse>("/municipios/todos");
+  return response.data.municipios;
+}
+
+export async function getTechnicianMunicipalities() {
+  const response = await api.get<MunicipalitiesResponse>("/municipios");
+  return response.data.municipios;
+}
+
+export async function getImmediateRegions() {
+  const response = await api.get<ImmediateRegionsResponse>("/municipios/regioes-imediatas");
+  return response.data.regioes;
+}
+
+// Compatibilidade com os formulários existentes.
 export async function Allmunicipios() {
-  const  response  = await api.get('/municipios/todos')
-  console.log('municipio', response.data)
-
-  return response.data
+  return { municipios: await getAllMunicipalities() };
 }
-
 export async function municipios() {
-  const  response  = await api.get('/municipios')
-  console.log('municipio', response.data)
-
-  return response.data
+  return { municipios: await getTechnicianMunicipalities() };
 }
-
 export async function regioes() {
-  const  response  = await api.get('/municipios/regioes-imediatas')
-  console.log('municipio', response.data)
-
-  return response.data
+  return { regioes: await getImmediateRegions() };
 }
