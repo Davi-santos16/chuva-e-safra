@@ -28,41 +28,6 @@ const sidebarContent: MenuItem[] = [
       },
     ],
   },
-  {
-    heading: 'Exemplos',
-    children: [
-      {
-        id: 'tabela',
-        name: 'Tabela',
-        icon: 'solar:server-linear',
-        url: '/utilities/table',
-      },
-      {
-        id: 'tipografia',
-        name: 'Tipografia',
-        icon: 'solar:text-circle-outline',
-        url: '/utilities/typography',
-      },
-      {
-        id: 'formulario',
-        name: 'Formulário',
-        icon: 'solar:document-add-linear',
-        url: '/utilities/form',
-      },
-      {
-        id: 'sombras',
-        name: 'Sombras',
-        icon: 'solar:airbuds-case-charge-outline',
-        url: '/utilities/shadow',
-      },
-      {
-        id: 'icones',
-        name: 'Ícones',
-        icon: 'solar:palette-linear',
-        url: '/icons/tabler',
-      },
-    ],
-  },
 ]
 
 export default sidebarContent
