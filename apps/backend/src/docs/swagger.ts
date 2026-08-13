@@ -178,6 +178,32 @@ Selecione abaixo o schema correspondente ao tipo de usuário para ver apenas os 
         },
       },
     },
+    "/me": {
+      get: {
+        tags: ["Autenticação"],
+        summary: "Obter o usuário autenticado",
+        description:
+          "Retorna os dados atuais da conta identificada pelo token JWT, sem expor a senha.",
+        operationId: "getCurrentUser",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          "200": {
+            description: "Dados do usuário autenticado.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/MeResponse" },
+              },
+            },
+          },
+          "401": {
+            $ref: "#/components/responses/Unauthorized",
+          },
+          "500": {
+            $ref: "#/components/responses/InternalServerError",
+          },
+        },
+      },
+    },
     "/municipios/regioes-imediatas": {
       get: {
         tags: ["Municípios"],
@@ -598,6 +624,42 @@ Selecione abaixo o schema correspondente ao tipo de usuário para ver apenas os 
             description: "Token JWT assinado contendo o identificador e o perfil do usuário.",
             example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
           },
+        },
+      },
+      CurrentUser: {
+        type: "object",
+        required: ["id", "name", "email", "role", "createdAT"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          name: { type: "string", example: "Maria da Silva" },
+          email: { type: "string", format: "email", example: "maria@example.com" },
+          role: { $ref: "#/components/schemas/UserRole" },
+          municipio: {
+            type: "string",
+            nullable: true,
+            description: "Código IBGE do município vinculado ao produtor.",
+            example: "2304400",
+          },
+          regiaoImediataId: {
+            type: "integer",
+            nullable: true,
+            description: "Região imediata vinculada ao técnico.",
+            example: 230002,
+          },
+          uf: {
+            type: "string",
+            nullable: true,
+            example: "CE",
+          },
+          createdAT: { type: "string", format: "date-time" },
+          updatedAT: { type: "string", format: "date-time", nullable: true },
+        },
+      },
+      MeResponse: {
+        type: "object",
+        required: ["user"],
+        properties: {
+          user: { $ref: "#/components/schemas/CurrentUser" },
         },
       },
       MessageResponse: {

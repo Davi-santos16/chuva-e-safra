@@ -16,7 +16,14 @@ export interface TokenPayload {
 
 export interface AuthUser {
   id: string;
+  name: string;
+  email: string;
   role: UserRole;
+  municipio: string | null;
+  regiaoImediataId: number | null;
+  uf: string | null;
+  createdAT: string;
+  updatedAT: string | null;
 }
 
 export interface LoginCredentials {

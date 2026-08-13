@@ -1,9 +1,13 @@
 import { isAxiosError } from 'axios'
 import { api } from '../api/config'
-import type { LoginCredentials } from '@/lib/auth/types'
+import type { AuthUser, LoginCredentials } from '@/lib/auth/types'
 
 interface LoginResponse {
   token: string
+}
+
+interface MeResponse {
+  user: AuthUser
 }
 
 interface ApiErrorResponse {
@@ -14,6 +18,12 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
   const { data } = await api.post<LoginResponse>('/auth/login', credentials)
 
   return data
+}
+
+export async function getCurrentUser(): Promise<AuthUser> {
+  const { data } = await api.get<MeResponse>('/me')
+
+  return data.user
 }
 
 export function getLoginErrorMessage(error: unknown): string {

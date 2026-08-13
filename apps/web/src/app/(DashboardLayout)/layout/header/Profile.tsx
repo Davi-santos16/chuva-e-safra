@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 const Profile = () => {
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
   const router = useRouter()
 
   const handleLogout = () => {
@@ -36,7 +36,7 @@ const Profile = () => {
             className='inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'>
             <Image
               src='/images/profile/user-1.jpg'
-              alt='Foto de perfil'
+              alt={user ? `Foto de perfil de ${user.name}` : 'Foto de perfil'}
               height={36}
               width={36}
               className='rounded-full object-cover'
@@ -46,7 +46,13 @@ const Profile = () => {
 
         <DropdownMenuContent
           align='end'
-          className='w-[184px] rounded-xl border border-border pb-3 pt-1'>
+          className='w-[280px] rounded-xl border border-border pb-3 pt-1'>
+          {user && (
+            <div className='border-b border-border px-3 py-3'>
+              <p className='truncate text-sm font-semibold text-foreground'>{user.name}</p>
+              <p className='mt-0.5 truncate text-xs text-muted-foreground'>{user.email}</p>
+            </div>
+          )}
           <SimpleBar>
             {profileData.profileDD.map((item, index) => (
               <DropdownMenuItem key={index} asChild>
@@ -72,7 +78,7 @@ const Profile = () => {
 
           <div className='px-3'>
             <Button variant='outline' className='w-full rounded-md' onClick={handleLogout}>
-              Logout
+              Sair
             </Button>
           </div>
         </DropdownMenuContent>
