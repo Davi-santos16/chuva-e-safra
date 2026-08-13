@@ -17,7 +17,7 @@ interface ParametrosAnalise {
   uf?: string;
 }
 
-const perfilPorRole: Record<UserRole, PerfilAnalise> = {
+const perfilPorRole: Record<Exclude<UserRole, "ADMIN">, PerfilAnalise> = {
   PRODUTOR: "PRODUTOR",
   TECNICO_COOPERATIVA: "TECNICO",
   GESTOR_PUBLICO: "GESTOR",
@@ -79,6 +79,10 @@ class AnalisesController {
 
     if (!user) {
       throw new AppError("Usuário não encontrado", 401);
+    }
+
+    if (user.role === "ADMIN") {
+      throw new AppError("Administradores não possuem escopo de análise agrícola.", 403);
     }
 
     const params: ParametrosAnalise = {

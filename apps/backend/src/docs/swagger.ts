@@ -26,6 +26,10 @@ const swaggerDocument = {
       name: "Municípios",
       description: "Regiões imediatas e municípios permitidos para o técnico.",
     },
+    {
+      name: "Administração",
+      description: "Gestão de usuários disponível exclusivamente para administradores.",
+    },
   ],
   paths: {
     "/auth/register": {
@@ -167,6 +171,32 @@ Selecione abaixo o schema correspondente ao tipo de usuário para ver apenas os 
                 example: { message: "E-mail ou senha inválidos" },
               },
             },
+          },
+          "500": {
+            $ref: "#/components/responses/InternalServerError",
+          },
+        },
+      },
+    },
+    "/me": {
+      get: {
+        tags: ["Autenticação"],
+        summary: "Obter o usuário autenticado",
+        description:
+          "Retorna os dados atuais da conta identificada pelo token JWT, sem expor a senha.",
+        operationId: "getCurrentUser",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          "200": {
+            description: "Dados do usuário autenticado.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/MeResponse" },
+              },
+            },
+          },
+          "401": {
+            $ref: "#/components/responses/Unauthorized",
           },
           "500": {
             $ref: "#/components/responses/InternalServerError",
@@ -335,6 +365,54 @@ Selecione abaixo o schema correspondente ao tipo de usuário para ver apenas os 
         },
       },
     },
+    "/admin/users": {
+      get: {
+        tags: ["Administração"],
+        summary: "Listar usuários da plataforma",
+        description:
+          "Retorna as contas cadastradas e a quantidade por perfil. Requer um JWT com role ADMIN.",
+        operationId: "getAdminUsers",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          "200": {
+            description: "Usuários e resumo por perfil.",
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": {
+            description: "A rota é exclusiva para administradores.",
+          },
+        },
+      },
+      post: {
+        tags: ["Administração"],
+        summary: "Criar outro administrador",
+        description:
+          "Provisiona uma nova conta administrativa. A rota pública de cadastro não aceita ADMIN.",
+        operationId: "createAdminUser",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/CreateAdminRequest" },
+              example: {
+                name: "Administrador da plataforma",
+                email: "admin@example.com",
+                password: "senha-segura",
+                role: "ADMIN",
+              },
+            },
+          },
+        },
+        responses: {
+          "201": { description: "Administrador criado com sucesso." },
+          "400": { $ref: "#/components/responses/BadRequest" },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { description: "A rota é exclusiva para administradores." },
+          "409": { description: "O e-mail já está cadastrado." },
+        },
+      },
+    },
   },
   components: {
     securitySchemes: {
@@ -348,12 +426,13 @@ Selecione abaixo o schema correspondente ao tipo de usuário para ver apenas os 
     schemas: {
       UserRole: {
         type: "string",
-        enum: ["PRODUTOR", "TECNICO_COOPERATIVA", "GESTOR_PUBLICO"],
+        enum: ["PRODUTOR", "TECNICO_COOPERATIVA", "GESTOR_PUBLICO", "ADMIN"],
         description: `Tipo de usuário e escopo dos dados agrícolas:
 
 - \`PRODUTOR\`: vinculado a um município do Ceará.
 - \`TECNICO_COOPERATIVA\`: vinculado a uma região imediata do Ceará.
-- \`GESTOR_PUBLICO\`: vinculado automaticamente à UF CE.`,
+- \`GESTOR_PUBLICO\`: vinculado automaticamente à UF CE.
+- \`ADMIN\`: gerencia contas e não possui escopo de análise agrícola.`,
         example: "PRODUTOR",
       },
       RegisterRequest: {
@@ -506,6 +585,18 @@ Selecione abaixo o schema correspondente ao tipo de usuário para ver apenas os 
         },
         additionalProperties: false,
       },
+      CreateAdminRequest: {
+        title: "Criação protegida de administrador",
+        type: "object",
+        required: ["name", "email", "password", "role"],
+        properties: {
+          name: { type: "string", minLength: 3, maxLength: 100 },
+          email: { type: "string", format: "email" },
+          password: { type: "string", format: "password", minLength: 8, writeOnly: true },
+          role: { type: "string", enum: ["ADMIN"] },
+        },
+        additionalProperties: false,
+      },
       LoginRequest: {
         type: "object",
         required: ["email", "password"],
@@ -533,6 +624,42 @@ Selecione abaixo o schema correspondente ao tipo de usuário para ver apenas os 
             description: "Token JWT assinado contendo o identificador e o perfil do usuário.",
             example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
           },
+        },
+      },
+      CurrentUser: {
+        type: "object",
+        required: ["id", "name", "email", "role", "createdAT"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          name: { type: "string", example: "Maria da Silva" },
+          email: { type: "string", format: "email", example: "maria@example.com" },
+          role: { $ref: "#/components/schemas/UserRole" },
+          municipio: {
+            type: "string",
+            nullable: true,
+            description: "Código IBGE do município vinculado ao produtor.",
+            example: "2304400",
+          },
+          regiaoImediataId: {
+            type: "integer",
+            nullable: true,
+            description: "Região imediata vinculada ao técnico.",
+            example: 230002,
+          },
+          uf: {
+            type: "string",
+            nullable: true,
+            example: "CE",
+          },
+          createdAT: { type: "string", format: "date-time" },
+          updatedAT: { type: "string", format: "date-time", nullable: true },
+        },
+      },
+      MeResponse: {
+        type: "object",
+        required: ["user"],
+        properties: {
+          user: { $ref: "#/components/schemas/CurrentUser" },
         },
       },
       MessageResponse: {

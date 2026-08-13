@@ -8,9 +8,12 @@ import { sign, verify } from "jsonwebtoken";
 import { api } from "@/api/config";
 import { authConfig } from "@/configs/auth";
 import { AnalisesController } from "@/controllers/analisesController";
+import { MeController } from "@/controllers/meController";
 import { SessionsController } from "@/controllers/sessionsController";
 import { prisma } from "@/database/prisma";
 import { ensureAuthenticated } from "@/middlewares/ensureAuthenticated";
+import { checkInputsUser } from "@/middlewares/checkInputsUser";
+import { verifyUserAuthorization } from "@/middlewares/verifyUserAuthorization";
 
 const jwtSecret = "segredo-usado-apenas-nos-testes";
 authConfig.jwt.secret = jwtSecret;
@@ -48,7 +51,7 @@ test("cria uma sessão e inclui id e perfil no JWT", async () => {
     uf: null,
     createdAT: new Date(),
     updatedAT: null,
-  })) as typeof prisma.user.findUnique;
+  })) as unknown as typeof prisma.user.findUnique;
 
   try {
     const response = responseMock();
@@ -97,6 +100,78 @@ test("autentica um Bearer token válido e rejeita token inválido", () => {
       ),
     (error: { statusCode?: number }) => error.statusCode === 401,
   );
+});
+
+test("retorna os dados do usuário autenticado sem expor a senha", async () => {
+  const originalFindUnique = prisma.user.findUnique;
+  prisma.user.findUnique = (async () => ({
+    id: "produtor-123",
+    name: "Maria da Silva",
+    email: "maria@example.com",
+    role: "PRODUTOR",
+    municipio: "2304400",
+    regiaoImediataId: null,
+    uf: null,
+    createdAT: new Date("2026-08-01T10:00:00.000Z"),
+    updatedAT: null,
+  })) as unknown as typeof prisma.user.findUnique;
+
+  try {
+    const response = responseMock();
+    await new MeController().show(
+      { user: { id: "produtor-123", role: "PRODUTOR" } } as Request,
+      response as unknown as Response,
+    );
+
+    const body = response.body as { user: Record<string, unknown> };
+    assert.equal(response.statusCode, 200);
+    assert.equal(body.user.id, "produtor-123");
+    assert.equal(body.user.name, "Maria da Silva");
+    assert.equal(body.user.email, "maria@example.com");
+    assert.equal(body.user.role, "PRODUTOR");
+    assert.equal(body.user.municipio, "2304400");
+    assert.equal("password" in body.user, false);
+  } finally {
+    prisma.user.findUnique = originalFindUnique;
+  }
+});
+
+test("reconhece ADMIN no JWT e protege o provisionamento administrativo", () => {
+  const token = sign({ role: "ADMIN" }, jwtSecret, { subject: "admin-123" });
+  const request = { headers: { authorization: `Bearer ${token}` } } as Request;
+
+  ensureAuthenticated(request, {} as Response, () => undefined);
+  assert.equal(request.user?.role, "ADMIN");
+
+  assert.doesNotThrow(() =>
+    verifyUserAuthorization(["ADMIN"])(request, {} as Response, () => undefined),
+  );
+  assert.throws(
+    () =>
+      verifyUserAuthorization(["ADMIN"])(
+        { user: { id: "gestor-123", role: "GESTOR_PUBLICO" } } as Request,
+        {} as Response,
+        () => undefined,
+      ),
+    (error: { statusCode?: number }) => error.statusCode === 403,
+  );
+
+  let validationError: unknown;
+  checkInputsUser(
+    {
+      body: {
+        name: "Administrador",
+        email: "admin@example.com",
+        password: "senha123",
+        role: "ADMIN",
+      },
+    } as Request,
+    {} as Response,
+    (error?: unknown) => {
+      validationError = error;
+    },
+  );
+  assert.ok(validationError, "ADMIN não deve ser aceito no cadastro público");
 });
 
 test("monta os filtros de análise conforme o perfil", async () => {

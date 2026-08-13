@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 import { PrismaPg } from "@prisma/adapter-pg";
+import { hash } from "bcrypt";
 import { z } from "zod";
 
 import { PrismaClient } from "./generated/prisma/client";
@@ -33,6 +34,47 @@ async function buscarMunicipiosDoCeara() {
   return municipiosIbgeSchema.parse(await response.json());
 }
 
+async function provisionarAdministrador(prisma: PrismaClient) {
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const password = process.env.ADMIN_PASSWORD;
+  const name = process.env.ADMIN_NAME?.trim() || "Administrador";
+
+  if (!email && !password) return;
+
+  if (!email || !password) {
+    throw new Error("Configure ADMIN_EMAIL e ADMIN_PASSWORD em conjunto.");
+  }
+
+  if (!z.email().safeParse(email).success) {
+    throw new Error("ADMIN_EMAIL deve ser um e-mail válido.");
+  }
+
+  if (password.length < 8) {
+    throw new Error("ADMIN_PASSWORD deve ter pelo menos 8 caracteres.");
+  }
+
+  const existingAdmin = await prisma.user.findUnique({ where: { email } });
+
+  if (existingAdmin) {
+    await prisma.user.update({
+      where: { email },
+      data: { name, role: "ADMIN" },
+    });
+    console.log(`Administrador ${email} atualizado.`);
+    return;
+  }
+
+  await prisma.user.create({
+    data: {
+      name,
+      email,
+      password: await hash(password, 10),
+      role: "ADMIN",
+    },
+  });
+  console.log(`Administrador ${email} criado.`);
+}
+
 async function main() {
   const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
 
@@ -45,6 +87,7 @@ async function main() {
   });
 
   try {
+    await provisionarAdministrador(prisma);
     const municipios = await buscarMunicipiosDoCeara();
     const tamanhoDoLote = 10;
 

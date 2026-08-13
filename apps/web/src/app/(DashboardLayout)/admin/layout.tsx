@@ -1,6 +1,6 @@
 "use client";
 import { RouteGuard } from "@/components/auth/route-guard";
-import { GESTOR_ROLES } from "@/lib/auth/types";
+import { ADMIN_ROLES } from "@/lib/auth/types";
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <RouteGuard allowedRoles={GESTOR_ROLES}>{children}</RouteGuard>;
+  return <RouteGuard allowedRoles={ADMIN_ROLES}>{children}</RouteGuard>;
 }

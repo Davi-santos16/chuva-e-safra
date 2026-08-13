@@ -1,301 +1,114 @@
 "use client";
-import Image from "next/image"
-import CardBox from "../shared/CardBox"
-import Link from "next/link"
-import { Icon } from "@iconify/react/dist/iconify.js"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from "@/components/ui/dialog"
-import { useState, useEffect } from "react";
+
+import Image from "next/image";
+
 import BreadcrumbComp from "@/app/(DashboardLayout)/layout/shared/breadcrumb/BreadcrumbComp";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import CardBox from "@/app/components/shared/CardBox";
+import { useAuth } from "@/hooks/use-auth";
+import { HOME_BY_ROLE, type UserRole } from "@/lib/auth/types";
+
+const ROLE_LABELS: Record<UserRole, string> = {
+  PRODUTOR: "Produtor",
+  TECNICO_COOPERATIVA: "Técnico de cooperativa",
+  GESTOR_PUBLICO: "Gestor público",
+  ADMIN: "Administrador",
+};
+
+function formatDate(value: string | null) {
+  if (!value) return "Não informado";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "long",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
+function ProfileField({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {label}
+      </dt>
+      <dd className="mt-1 break-words text-sm text-foreground">{value}</dd>
+    </div>
+  );
+}
 
 const UserProfile = () => {
-    const [openModal, setOpenModal] = useState(false);
-    const [modalType, setModalType] = useState<"personal" | "address" | null>(null);
+  const { user } = useAuth();
 
-    const BCrumb = [
-        {
-            to: "/",
-            title: "Home",
-        },
-        {
-            title: "Userprofile",
-        },
-    ];
+  if (!user) return null;
 
-    const [personal, setPersonal] = useState({
-        firstName: "Mathew",
-        lastName: "Anderson",
-        email: "mathew.anderson@gmail.com",
-        phone: "(347) 528-1947",
-        position: "Team Leader",
-        facebook: "https://www.facebook.com/wrappixel",
-        twitter: "https://twitter.com/wrappixel",
-        github: "https://github.com/wrappixel",
-        dribbble: "https://dribbble.com/wrappixel"
-    });
+  const territorialFields = {
+    PRODUTOR: [
+      { label: "Município (código IBGE)", value: user.municipio ?? "Não informado" },
+    ],
+    TECNICO_COOPERATIVA: [
+      {
+        label: "Região imediata",
+        value: user.regiaoImediataId?.toString() ?? "Não informada",
+      },
+    ],
+    GESTOR_PUBLICO: [{ label: "UF", value: user.uf ?? "Não informada" }],
+    ADMIN: [{ label: "Escopo", value: "Administração da plataforma" }],
+  }[user.role];
 
-    const [address, setAddress] = useState({
-        location: "United States",
-        state: "San Diego, California, United States",
-        pin: "92101",
-        zip: "30303",
-        taxNo: "GA45273910"
-    });
+  return (
+    <>
+      <BreadcrumbComp
+        title="Meu perfil"
+        items={[
+          { to: HOME_BY_ROLE[user.role], title: "Dashboard" },
+          { title: "Meu perfil" },
+        ]}
+      />
 
-    const [tempPersonal, setTempPersonal] = useState(personal);
-    const [tempAddress, setTempAddress] = useState(address);
-
-    useEffect(() => {
-        if (openModal && modalType === "personal") {
-            setTempPersonal(personal);
-        }
-        if (openModal && modalType === "address") {
-            setTempAddress(address);
-        }
-    }, [openModal, modalType, personal, address]);
-
-    const handleSave = () => {
-        if (modalType === "personal") {
-            setPersonal(tempPersonal);
-        } else if (modalType === "address") {
-            setAddress(tempAddress);
-        }
-        setOpenModal(false);
-    };
-
-    const socialLinks = [
-        { href: "https://www.facebook.com/wrappixel", icon: "streamline-logos:facebook-logo-2-solid", name: "Facebook" },
-        { href: "https://twitter.com/wrappixel", icon: "streamline-logos:x-twitter-logo-solid", name: "X" },
-        { href: "https://github.com/wrappixel", icon: "ion:logo-github", name: "GitHub" },
-        { href: "https://dribbble.com/wrappixel", icon: "streamline-flex:dribble-logo-remix", name: "Dribbble" },
-    ];
-
-    return (
-        <>
-            <BreadcrumbComp title="User Profile" items={BCrumb} />
-            <div className="flex flex-col gap-6">
-                <CardBox className="p-6 overflow-hidden">
-                    <div className="flex flex-col sm:flex-row items-center gap-6 rounded-xl relative w-full break-words">
-                        <div>
-                            <Image src={"/images/profile/user-1.jpg"} alt={`${personal.firstName} ${personal.lastName}`} width={80} height={80} className="rounded-full" />
-                        </div>
-                        <div className="flex flex-wrap gap-4 justify-center sm:justify-between items-center w-full">
-                            <div className="flex flex-col sm:text-left text-center gap-1.5">
-                                <h5 className="card-title">{personal.firstName} {personal.lastName}</h5>
-                                <div className="flex flex-wrap items-center gap-1 md:gap-3">
-                                    <p className="text-sm text-muted-foreground">{personal.position}</p>
-                                    <div className="hidden h-4 w-px bg-border xl:block" aria-hidden="true"></div>
-                                    <p className="text-sm text-muted-foreground">{address.location}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {socialLinks.map((item, index) => (
-                                    <Link key={index} href={item.href} target="_blank" rel="noopener noreferrer" aria-label={item.name} className="flex h-11 w-11 items-center justify-center gap-2 rounded-full shadow-sm border border-border hover:bg-muted hover:text-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                                        <Icon icon={item.icon} width="20" height="20" aria-hidden="true" />
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </CardBox>
-
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <div className="space-y-6 rounded-lg border border-border bg-card shadow-sm md:p-6 p-4 relative w-full break-words">
-                        <h5 className="card-title">Personal Information</h5>
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-7 2xl:gap-x-32">
-                            <div><p className="text-xs text-muted-foreground">First Name</p><p>{personal.firstName}</p></div>
-                            <div><p className="text-xs text-muted-foreground">Last Name</p><p>{personal.lastName}</p></div>
-                            <div><p className="text-xs text-muted-foreground">Email</p><p>{personal.email}</p></div>
-                            <div><p className="text-xs text-muted-foreground">Phone</p><p>{personal.phone}</p></div>
-                            <div><p className="text-xs text-muted-foreground">Position</p><p>{personal.position}</p></div>
-                        </div>
-                        <div className="flex justify-end">
-                            <Button onClick={() => { setModalType("personal"); setOpenModal(true); }} className="flex items-center gap-1.5 rounded-md">
-                                <Icon icon="ic:outline-edit" width="18" height="18" aria-hidden="true" /> Edit
-                            </Button>
-                        </div>
-                    </div>
-
-                    <div className="space-y-6 rounded-lg border border-border bg-card shadow-sm md:p-6 p-4 relative w-full break-words">
-                        <h5 className="card-title">Address Details</h5>
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-7 2xl:gap-x-32">
-                            <div><p className="text-xs text-muted-foreground">Location</p><p>{address.location}</p></div>
-                            <div><p className="text-xs text-muted-foreground">Province / State</p><p>{address.state}</p></div>
-                            <div><p className="text-xs text-muted-foreground">PIN Code</p><p>{address.pin}</p></div>
-                            <div><p className="text-xs text-muted-foreground">ZIP</p><p>{address.zip}</p></div>
-                            <div><p className="text-xs text-muted-foreground">Federal Tax No.</p><p>{address.taxNo}</p></div>
-                        </div>
-                        <div className="flex justify-end">
-                            <Button onClick={() => { setModalType("address"); setOpenModal(true); }} className="flex items-center gap-1.5 rounded-md">
-                                <Icon icon="ic:outline-edit" width="18" height="18" aria-hidden="true" /> Edit
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+      <div className="flex flex-col gap-6">
+        <CardBox className="overflow-hidden p-6">
+          <div className="flex flex-col items-center gap-5 sm:flex-row">
+            <Image
+              src="/images/profile/user-1.jpg"
+              alt={`Foto de perfil de ${user.name}`}
+              width={88}
+              height={88}
+              className="rounded-full object-cover"
+              priority
+            />
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl font-semibold text-foreground">{user.name}</h1>
+              <p className="mt-1 text-sm text-muted-foreground">{user.email}</p>
+              <span className="mt-3 inline-flex rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-interactive">
+                {ROLE_LABELS[user.role]}
+              </span>
             </div>
+          </div>
+        </CardBox>
 
-            <Dialog open={openModal} onOpenChange={setOpenModal}>
-                <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                        <DialogTitle className="mb-4">
-                            {modalType === "personal" ? "Edit Personal Information" : "Edit Address Details"}
-                        </DialogTitle>
-                    </DialogHeader>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
+            <h2 className="text-lg font-semibold text-foreground">Dados da conta</h2>
+            <dl className="mt-5 grid gap-5 sm:grid-cols-2">
+              <ProfileField label="Nome" value={user.name} />
+              <ProfileField label="E-mail" value={user.email} />
+              <ProfileField label="Perfil" value={ROLE_LABELS[user.role]} />
+              <ProfileField label="Identificador" value={user.id} />
+            </dl>
+          </section>
 
-                    {modalType === "personal" ? (
-                        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="firstName">First Name</Label>
-                                <Input
-                                    id="firstName"
-                                    placeholder="First Name"
-                                    value={tempPersonal.firstName}
-                                    onChange={(e) => setTempPersonal({ ...tempPersonal, firstName: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="lastName">Last Name</Label>
-                                <Input
-                                    id="lastName"
-                                    placeholder="Last Name"
-                                    value={tempPersonal.lastName}
-                                    onChange={(e) => setTempPersonal({ ...tempPersonal, lastName: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    placeholder="Email"
-                                    value={tempPersonal.email}
-                                    onChange={(e) => setTempPersonal({ ...tempPersonal, email: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="phone">Phone</Label>
-                                <Input
-                                    id="phone"
-                                    placeholder="Phone"
-                                    value={tempPersonal.phone}
-                                    onChange={(e) => setTempPersonal({ ...tempPersonal, phone: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="position">Position</Label>
-                                <Input
-                                    id="position"
-                                    placeholder="Position"
-                                    value={tempPersonal.position}
-                                    onChange={(e) => setTempPersonal({ ...tempPersonal, position: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="facebook">Facebook URL</Label>
-                                <Input
-                                    id="facebook"
-                                    placeholder="Facebook URL"
-                                    value={tempPersonal.facebook}
-                                    onChange={(e) => setTempPersonal({ ...tempPersonal, facebook: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="twitter">Twitter URL</Label>
-                                <Input
-                                    id="twitter"
-                                    placeholder="Twitter URL"
-                                    value={tempPersonal.twitter}
-                                    onChange={(e) => setTempPersonal({ ...tempPersonal, twitter: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="github">GitHub URL</Label>
-                                <Input
-                                    id="github"
-                                    placeholder="GitHub URL"
-                                    value={tempPersonal.github}
-                                    onChange={(e) => setTempPersonal({ ...tempPersonal, github: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="dribbble">Dribbble URL</Label>
-                                <Input
-                                    id="dribbble"
-                                    placeholder="Dribbble URL"
-                                    value={tempPersonal.dribbble}
-                                    onChange={(e) => setTempPersonal({ ...tempPersonal, dribbble: e.target.value })}
-                                />
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="location">Location</Label>
-                                <Input
-                                    id="location"
-                                    placeholder="Location"
-                                    value={tempAddress.location}
-                                    onChange={(e) => setTempAddress({ ...tempAddress, location: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="state">Province / State</Label>
-                                <Input
-                                    id="state"
-                                    placeholder="Province / State"
-                                    value={tempAddress.state}
-                                    onChange={(e) => setTempAddress({ ...tempAddress, state: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="pin">PIN Code</Label>
-                                <Input
-                                    id="pin"
-                                    placeholder="PIN Code"
-                                    value={tempAddress.pin}
-                                    onChange={(e) => setTempAddress({ ...tempAddress, pin: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="zip">ZIP</Label>
-                                <Input
-                                    id="zip"
-                                    placeholder="ZIP"
-                                    value={tempAddress.zip}
-                                    onChange={(e) => setTempAddress({ ...tempAddress, zip: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="taxNo">Federal Tax No.</Label>
-                                <Input
-                                    id="taxNo"
-                                    placeholder="Federal Tax No."
-                                    value={tempAddress.taxNo}
-                                    onChange={(e) => setTempAddress({ ...tempAddress, taxNo: e.target.value })}
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    <DialogFooter className="flex gap-2 mt-4">
-                        <Button className="rounded-md" onClick={handleSave}>
-                            Save Changes
-                        </Button>
-                        <Button variant="outline" className="rounded-md" onClick={() => setOpenModal(false)}>
-                            Close
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </>
-    );
+          <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
+            <h2 className="text-lg font-semibold text-foreground">Vínculo e atividade</h2>
+            <dl className="mt-5 grid gap-5 sm:grid-cols-2">
+              {territorialFields.map((field) => (
+                <ProfileField key={field.label} label={field.label} value={field.value} />
+              ))}
+              <ProfileField label="Conta criada em" value={formatDate(user.createdAT)} />
+              <ProfileField label="Última atualização" value={formatDate(user.updatedAT)} />
+            </dl>
+          </section>
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default UserProfile;
