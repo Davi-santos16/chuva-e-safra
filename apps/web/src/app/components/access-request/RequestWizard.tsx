@@ -1,29 +1,260 @@
 "use client";
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
+
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { isAxiosError } from "axios";
 import { Eye, EyeOff, FileText, Image as ImageIcon, Trash2, UploadCloud } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { createAccessRequest } from "@/services/access-request";
+import { getAllMunicipalities, getImmediateRegions, ImmediateRegion, Municipality } from "@/services/municipio";
 import { AccessShell } from "./AccessShell";
 import { ProfileSelector } from "./ProfileSelector";
-import { initialRequest, ProfileType, RequestData, UploadedFile, profileCopy } from "./types";
-const steps = ["Perfil", "Dados pessoais", "Atuação profissional", "Documentos", "Dados de acesso", "Revisão"];
-const cities = ["Amontada", "Itapipoca", "Itarema", "Trairi", "Sobral", "Acaraú", "Fortaleza"];
-const cultures = ["Milho", "Feijão", "Mandioca", "Caju", "Coco", "Banana", "Hortaliças", "Fruticultura", "Pecuária", "Outra"];
+import { ProfileType, UploadedFile, profileCopy } from "./types";
+
+const steps = ["Dados da solicitação", "Documento", "Revisão"];
 type Errors = Record<string, string>;
-function mask(value: string, kind: "cpf" | "phone" | "cep") { const n=value.replace(/\D/g,""); if(kind==="cpf") return n.slice(0,11).replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2"); if(kind==="phone") return n.slice(0,11).replace(/(\d{2})(\d)/,"($1) $2").replace(/(\d{5})(\d)/,"$1-$2"); return n.slice(0,8).replace(/(\d{5})(\d)/,"$1-$2"); }
-function Field({label,name,value,onChange,error,required=true,type="text",placeholder}: {label:string;name:string;value:string;onChange:(v:string)=>void;error?:string;required?:boolean;type?:string;placeholder?:string}) { return <label className="block text-sm font-semibold text-foreground">{label}{required&&<span className="ml-1 text-destructive">*</span>}<input name={name} type={type} value={value} placeholder={placeholder} onChange={e=>onChange(e.target.value)} aria-invalid={!!error} aria-describedby={error?`${name}-error`:undefined} className="mt-2 h-11 w-full rounded-md border border-input bg-card px-3 text-sm font-normal outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/30 aria-[invalid=true]:border-destructive" />{error&&<span id={`${name}-error`} className="mt-1 block font-normal text-destructive">{error}</span>}</label> }
+
+function Field({ label, name, value, onChange, error, type = "text" }: {
+  label: string; name: string; value: string; onChange: (value: string) => void;
+  error?: string; type?: string;
+}) {
+  return (
+    <label className="block text-sm font-semibold text-foreground">
+      {label}<span className="ml-1 text-destructive">*</span>
+      <input
+        name={name}
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        aria-invalid={Boolean(error)}
+        className="mt-2 h-11 w-full rounded-md border border-input bg-card px-3 text-sm font-normal outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 aria-[invalid=true]:border-destructive"
+      />
+      {error && <span className="mt-1 block font-normal text-destructive">{error}</span>}
+    </label>
+  );
+}
+
 export function RequestWizard() {
- const router=useRouter(), search=useSearchParams(), [data,setData]=useState<RequestData>({...initialRequest,profile: search.get("perfil")==="tecnico"?"tecnico":"produtor"}), [step,setStep]=useState(0), [errors,setErrors]=useState<Errors>({}), [confirm,setConfirm]=useState(false), [sending,setSending]=useState(false), [showPass,setShowPass]=useState(false), top=useRef<HTMLDivElement>(null);
- const update=<K extends keyof RequestData>(key:K,value:RequestData[K])=>setData(d=>({...d,[key]:value}));
- const validation=()=>{const e:Errors={}; const req=(k:keyof RequestData,label:string)=>{if(!String(data[k]??"").trim())e[String(k)]=`${label} é obrigatório.`}; if(step===0&&!data.profile)e.profile="Escolha um perfil."; if(step===1){([['name','Nome completo'],['cpf','CPF'],['birthDate','Data de nascimento'],['email','E-mail'],['phone','Telefone'],['cep','CEP'],['city','Município'],['address','Endereço'],['number','Número'],['neighborhood','Bairro ou comunidade']] as [keyof RequestData,string][]).forEach(([k,l])=>req(k,l)); if(data.email&&!/^\S+@\S+\.\S+$/.test(data.email))e.email="Informe um e-mail válido."; if(data.birthDate && (new Date().getTime()-new Date(data.birthDate).getTime())/31557600000<18)e.birthDate="É necessário ter pelo menos 18 anos.";} if(step===2){ if(data.profile==="produtor")([['municipality','Município de atuação'],['propertyName','Nome da propriedade'],['relationship','Vínculo']] as [keyof RequestData,string][]).forEach(([k,l])=>req(k,l)); else req('formation','Formação profissional'); } if(step===3){if(!data.files.id)e.id="Envie um documento oficial com foto.";if(!data.files.selfie)e.selfie="Envie uma foto de identificação.";if(!data.files.activity)e.activity="Envie um comprovante de atuação.";} if(step===4){req('accessEmail','E-mail de acesso');if(data.password.length<8)e.password="A senha deve ter ao menos 8 caracteres.";if(data.password!==data.confirmPassword)e.confirmPassword="As senhas não coincidem.";if(!data.terms)e.terms="Aceite os Termos de Uso.";if(!data.privacy)e.privacy="Aceite a Política de Privacidade.";if(!data.consent)e.consent="Autorize a análise dos documentos.";} setErrors(e);return !Object.keys(e).length};
- const advance=()=>{if(validation()){setStep(s=>Math.min(5,s+1));setTimeout(()=>top.current?.focus(),0)}};
- const setProfile=(profile:ProfileType)=>{if(data.profile && data.profile!==profile && (data.propertyName||data.formation) && !window.confirm("Ao alterar o perfil, os dados exclusivos do perfil anterior serão removidos. Deseja continuar?"))return;setData(d=>({...d,profile,propertyName:"",municipality:"",relationship:"",cultures:[],formation:"",registration:"",organization:"",workCities:[],description:""}));};
- const fileChange=(key:string)=>(event:ChangeEvent<HTMLInputElement>)=>{const file=event.target.files?.[0];if(!file)return; if(!["application/pdf","image/jpeg","image/png"].includes(file.type)||file.size>10*1024*1024){setErrors(e=>({...e,[key]:"Use PDF, JPG ou PNG de até 10 MB."}));return;} const item:UploadedFile={id:crypto.randomUUID(),name:file.name,size:file.size,type:file.type,preview:file.type.startsWith("image/")?URL.createObjectURL(file):undefined};setData(d=>({...d,files:{...d.files,[key]:item}}));setErrors(e=>{const n={...e};delete n[key];return n});};
- useEffect(()=>()=>Object.values(data.files).forEach(f=>f?.preview&&URL.revokeObjectURL(f.preview)),[data.files]);
- const passwordRules=useMemo(()=>[["8 caracteres",data.password.length>=8],["letra maiúscula",/[A-Z]/.test(data.password)],["letra minúscula",/[a-z]/.test(data.password)],["número",/\d/.test(data.password)],["caractere especial",/[^A-Za-z0-9]/.test(data.password)]],[data.password]);
- const upload=(key:string,title:string,help:string)=><div className="rounded-xl border border-dashed border-border p-4"><div className="flex gap-3"><UploadCloud className="mt-1 size-5 shrink-0 text-interactive"/><div><p className="font-semibold">{title}</p><p className="mt-1 text-sm text-muted-foreground">{help}</p></div></div>{data.files[key]?<div className="mt-4 flex items-center gap-3 rounded-lg bg-muted p-3"><span>{data.files[key]?.preview?<ImageIcon className="text-success"/>:<FileText className="text-destructive"/>}</span><span className="min-w-0 flex-1 truncate text-sm">{data.files[key]?.name} <small className="text-muted-foreground">({((data.files[key]?.size||0)/1024/1024).toFixed(1)} MB)</small></span><button onClick={()=>setData(d=>({...d,files:{...d.files,[key]:undefined}}))} className="rounded p-2 text-destructive focus-visible:ring-2 focus-visible:ring-ring" aria-label={`Remover ${title}`}><Trash2 size={18}/></button></div>:<label className="mt-4 inline-flex min-h-11 cursor-pointer items-center rounded-md border border-interactive px-4 text-sm font-semibold text-interactive hover:bg-secondary"><input className="sr-only" type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={fileChange(key)}/>Selecionar arquivo</label>}{errors[key]&&<p className="mt-2 text-sm text-destructive">{errors[key]}</p>}</div>;
- const fields=()=>{if(step===0)return <><ProfileSelector value={data.profile} onChange={setProfile}/>{errors.profile&&<p className="mt-3 text-sm text-destructive">{errors.profile}</p>}</>;if(step===1)return <div className="grid gap-4 sm:grid-cols-2"><Field label="Nome completo" name="name" value={data.name} onChange={v=>update('name',v)} error={errors.name}/><Field label="CPF" name="cpf" value={data.cpf} onChange={v=>update('cpf',mask(v,'cpf'))} error={errors.cpf}/><Field label="Data de nascimento" name="birthDate" type="date" value={data.birthDate} onChange={v=>update('birthDate',v)} error={errors.birthDate}/><Field label="E-mail" name="email" type="email" value={data.email} onChange={v=>update('email',v)} error={errors.email}/><Field label="Telefone / WhatsApp" name="phone" value={data.phone} onChange={v=>update('phone',mask(v,'phone'))} error={errors.phone}/><Field label="CEP" name="cep" value={data.cep} onChange={v=>update('cep',mask(v,'cep'))} error={errors.cep}/><Field label="Estado" name="state" value={data.state} onChange={v=>update('state',v)} required={false}/><Field label="Município de residência" name="city" value={data.city} onChange={v=>update('city',v)} error={errors.city}/><Field label="Endereço" name="address" value={data.address} onChange={v=>update('address',v)} error={errors.address}/><Field label="Número" name="number" value={data.number} onChange={v=>update('number',v)} error={errors.number}/><Field label="Complemento" name="complement" value={data.complement} onChange={v=>update('complement',v)} required={false}/><Field label="Bairro ou comunidade" name="neighborhood" value={data.neighborhood} onChange={v=>update('neighborhood',v)} error={errors.neighborhood}/></div>;if(step===2&&data.profile==='produtor')return <div className="grid gap-4 sm:grid-cols-2"><Field label="Município principal de atuação" name="municipality" value={data.municipality} onChange={v=>update('municipality',v)} error={errors.municipality}/><Field label="Nome da propriedade" name="propertyName" value={data.propertyName} onChange={v=>update('propertyName',v)} error={errors.propertyName}/><Field label="Tipo de vínculo" name="relationship" value={data.relationship} onChange={v=>update('relationship',v)} error={errors.relationship} placeholder="Ex.: Proprietário"/><fieldset className="sm:col-span-2"><legend className="text-sm font-semibold">Principais culturas</legend><div className="mt-3 flex flex-wrap gap-2">{cultures.map(c=><button key={c} onClick={()=>update('cultures',data.cultures.includes(c)?data.cultures.filter(x=>x!==c):[...data.cultures,c])} className={`min-h-11 rounded-full border px-4 text-sm ${data.cultures.includes(c)?'border-primary bg-secondary text-interactive':'border-border'}`}>{c}</button>)}</div></fieldset>{data.cultures.includes('Outra')&&<Field label="Outra cultura" name="otherCulture" value={data.otherCulture} onChange={v=>update('otherCulture',v)} />}</div>;if(step===2)return <div className="grid gap-4 sm:grid-cols-2"><Field label="Formação profissional" name="formation" value={data.formation} onChange={v=>update('formation',v)} error={errors.formation} placeholder="Ex.: Engenharia Agronômica"/><Field label="Registro profissional" name="registration" value={data.registration} onChange={v=>update('registration',v)} required={false}/><Field label="Organização ou vínculo" name="organization" value={data.organization} onChange={v=>update('organization',v)} required={false} placeholder="Consultor independente, cooperativa..."/><fieldset className="sm:col-span-2"><legend className="text-sm font-semibold">Municípios onde atua</legend><div className="mt-3 flex flex-wrap gap-2">{cities.map(c=><button key={c} onClick={()=>update('workCities',data.workCities.includes(c)?data.workCities.filter(x=>x!==c):[...data.workCities,c])} className={`min-h-11 rounded-full border px-4 text-sm ${data.workCities.includes(c)?'border-primary bg-secondary text-interactive':'border-border'}`}>{c}</button>)}</div></fieldset><label className="sm:col-span-2 text-sm font-semibold">Breve descrição da atuação<textarea value={data.description} onChange={e=>update('description',e.target.value)} className="mt-2 min-h-28 w-full rounded-md border border-input bg-card p-3 font-normal"/></label></div>;if(step===3)return <div className="space-y-4">{upload('id','Documento oficial com foto','Frente e verso, quando necessário. PDF, JPG ou PNG até 10 MB.')}{upload('selfie','Foto de identificação','Usada somente para apoiar a validação de identidade; não há reconhecimento facial.')}{upload('activity',data.profile==='produtor'?'Comprovante de atuação rural':'Comprovante profissional','CAF, CAR ou documento equivalente; para técnico, diploma, registro ou declaração profissional.')}</div>;if(step===4)return <div className="space-y-5"><div className="grid gap-4 sm:grid-cols-2"><Field label="E-mail de acesso" name="accessEmail" type="email" value={data.accessEmail} onChange={v=>update('accessEmail',v)} error={errors.accessEmail}/><div/><div className="relative"><Field label="Senha" name="password" type={showPass?'text':'password'} value={data.password} onChange={v=>update('password',v)} error={errors.password}/><button type="button" className="absolute right-3 top-9 text-muted-foreground" onClick={()=>setShowPass(!showPass)} aria-label="Mostrar ou ocultar senha">{showPass?<EyeOff size={18}/>:<Eye size={18}/>}</button></div><Field label="Confirmação da senha" name="confirmPassword" type={showPass?'text':'password'} value={data.confirmPassword} onChange={v=>update('confirmPassword',v)} error={errors.confirmPassword}/></div><ul className="grid gap-1 text-sm">{passwordRules.map(([r,ok])=><li key={String(r)} className={ok?'text-success':'text-muted-foreground'}>{ok?'✓':'○'} {r}</li>)}</ul>{([['terms','Aceito os Termos de Uso'],['privacy','Aceito a Política de Privacidade'],['consent','Autorizo a análise dos documentos enviados']] as [keyof RequestData,string][]).map(([k,l])=><label key={String(k)} className="flex cursor-pointer items-start gap-3 text-sm"><Checkbox checked={data[k] as boolean} onCheckedChange={v=>update(k,!!v)}/><span>{l}</span>{errors[String(k)]&&<span className="text-destructive">— {errors[String(k)]}</span>}</label>)}</div>;return <div className="space-y-5"><p className="rounded-lg border border-warning bg-warning-soft p-4 text-sm">Revise atentamente suas informações. Depois do envio, a solicitação será encaminhada para análise administrativa.</p>{[["Perfil escolhido",data.profile?profileCopy[data.profile].label:""],["Dados pessoais",`${data.name} · ${data.email} · ${data.city}`],["Atuação profissional",data.profile==='produtor'?`${data.propertyName} · ${data.municipality}`:`${data.formation} · ${data.organization||'Atuação independente'}`],["Documentos",`${Object.values(data.files).filter(Boolean).length} documento(s) selecionado(s)`],["Dados de acesso",data.accessEmail],["Consentimentos",data.terms&&data.privacy&&data.consent?'Confirmados':'Pendentes']].map(([t,v],i)=><section key={t} className="rounded-xl border border-border p-4"><div className="flex items-center justify-between gap-4"><div><h3 className="text-base">{t}</h3><p className="mt-1 text-sm text-muted-foreground">{v}</p></div><button onClick={()=>setStep(i)} className="min-h-11 rounded-md px-3 text-sm font-semibold text-interactive hover:bg-secondary">Editar</button></div></section>)}</div>};
- return <AccessShell><section className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:py-12"><div className="mb-7" ref={top} tabIndex={-1}><p className="text-sm font-semibold text-success">Etapa {step+1} de 6</p><h1 className="mt-2 text-3xl">{steps[step]}</h1></div><div className="grid gap-8 lg:grid-cols-[1fr_270px]"><div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-8"><div aria-live="polite" className="sr-only">Etapa {step+1} de 6: {steps[step]}</div>{Object.keys(errors).length>0&&<div role="alert" className="mb-5 rounded-lg bg-destructive-soft p-3 text-sm text-destructive">Confira os campos indicados antes de continuar.</div>}{fields()}<div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between"><Button variant="outline" disabled={step===0} onClick={()=>{setStep(s=>s-1);setErrors({})}}>Voltar</Button>{step<5?<Button onClick={advance}>Continuar</Button>:<Button onClick={()=>setConfirm(true)}>Enviar solicitação</Button>}</div></div><aside className="h-fit rounded-2xl border border-border bg-muted p-5 lg:sticky lg:top-6"><p className="font-heading font-semibold">Progresso da solicitação</p><ol className="mt-5 space-y-4">{steps.map((name,i)=><li key={name} className={`flex gap-3 text-sm ${i===step?'font-semibold text-interactive':i<step?'text-success':'text-muted-foreground'}`}><span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-current text-xs">{i<step?'✓':i+1}</span>{name}</li>)}</ol><div className="mt-7 border-t border-border pt-5 text-sm text-muted-foreground"><strong className="text-foreground">Precisa de ajuda?</strong><p className="mt-1">Seus documentos ficam apenas nesta demonstração enquanto o fluxo estiver aberto.</p></div></aside></div></section><Dialog open={confirm} onOpenChange={setConfirm}><DialogContent><DialogHeader><DialogTitle>Confirmar envio da solicitação?</DialogTitle><DialogDescription>Seus dados e documentos serão encaminhados para análise. Você poderá acompanhar o andamento utilizando o protocolo gerado.</DialogDescription></DialogHeader><DialogFooter><Button variant="outline" onClick={()=>setConfirm(false)}>Continuar revisando</Button><Button disabled={sending} onClick={()=>{setSending(true);setTimeout(()=>router.push(`/solicitacao/enviada?nome=${encodeURIComponent(data.name)}&perfil=${data.profile}`),800)}}>{sending?'Enviando...':'Confirmar e enviar'}</Button></DialogFooter></DialogContent></Dialog></AccessShell>;
+  const router = useRouter();
+  const search = useSearchParams();
+  const [profile, setProfile] = useState<ProfileType>(search.get("perfil") === "tecnico" ? "tecnico" : "produtor");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [municipalityId, setMunicipalityId] = useState("");
+  const [regionId, setRegionId] = useState("");
+  const [document, setDocument] = useState<UploadedFile>();
+  const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
+  const [regions, setRegions] = useState<ImmediateRegion[]>([]);
+  const [optionsLoading, setOptionsLoading] = useState(true);
+  const [step, setStep] = useState(0);
+  const [errors, setErrors] = useState<Errors>({});
+  const [confirm, setConfirm] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const top = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([getAllMunicipalities(), getImmediateRegions()])
+      .then(([allMunicipalities, immediateRegions]) => {
+        if (active) {
+          setMunicipalities(allMunicipalities);
+          setRegions(immediateRegions);
+        }
+      })
+      .catch(() => setErrors({ options: "Não foi possível carregar municípios e regiões." }))
+      .finally(() => active && setOptionsLoading(false));
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => () => {
+    if (document?.preview) URL.revokeObjectURL(document.preview);
+  }, [document]);
+
+  function validateCurrentStep() {
+    const nextErrors: Errors = {};
+    if (step === 0) {
+      if (name.trim().length < 3) nextErrors.name = "Informe o nome completo.";
+      if (!/^\S+@\S+\.\S+$/.test(email)) nextErrors.email = "Informe um e-mail válido.";
+      if (password.length < 8) nextErrors.password = "A senha deve ter pelo menos 8 caracteres.";
+      if (password !== confirmPassword) nextErrors.confirmPassword = "As senhas não coincidem.";
+      if (profile === "produtor" && !municipalityId) nextErrors.location = "Selecione um município.";
+      if (profile === "tecnico" && !regionId) nextErrors.location = "Selecione uma região imediata.";
+    }
+    if (step === 1 && !document) {
+      nextErrors.document = profile === "produtor"
+        ? "Envie o documento CAF."
+        : "Envie o comprovante de registro profissional (CREA ou CFTA).";
+    }
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  }
+
+  function advance() {
+    if (!validateCurrentStep()) return;
+    setStep((current) => Math.min(2, current + 1));
+    setTimeout(() => top.current?.focus(), 0);
+  }
+
+  function handleFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!["application/pdf", "image/jpeg", "image/png"].includes(file.type) || file.size > 10 * 1024 * 1024) {
+      setErrors({ document: "Use PDF, JPG ou PNG de até 10 MB." });
+      return;
+    }
+    setDocument({
+      id: crypto.randomUUID(), name: file.name, size: file.size, type: file.type, file,
+      preview: file.type.startsWith("image/") ? URL.createObjectURL(file) : undefined,
+    });
+    setErrors({});
+  }
+
+  async function submit() {
+    if (!document) return;
+    setSending(true);
+    setErrors({});
+    try {
+      const result = await createAccessRequest({
+        name,
+        email,
+        password,
+        role: profile === "produtor" ? "PRODUTOR" : "TECNICO_COOPERATIVA",
+        municipioId: profile === "produtor" ? Number(municipalityId) : undefined,
+        regiaoImediataId: profile === "tecnico" ? Number(regionId) : undefined,
+        document: document.file,
+      });
+      router.push(`/solicitacao/enviada?nome=${encodeURIComponent(name)}&perfil=${profile}&protocolo=${encodeURIComponent(result.solicitation.protocol)}&email=${encodeURIComponent(email)}`);
+    } catch (error) {
+      const message = isAxiosError<{ message?: string | string[] }>(error) ? error.response?.data?.message : undefined;
+      setErrors({ submit: Array.isArray(message) ? message.join(" ") : message || "Não foi possível enviar a solicitação." });
+      setConfirm(false);
+    } finally {
+      setSending(false);
+    }
+  }
+
+  const selectedLocation = profile === "produtor"
+    ? municipalities.find((item) => String(item.id) === municipalityId)?.nome
+    : regions.find((item) => String(item.regiaoImediataId) === regionId)?.regiaoImediataNome;
+
+  return (
+    <AccessShell>
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:py-12">
+        <div className="mb-7" ref={top} tabIndex={-1}>
+          <p className="text-sm font-semibold text-success">Etapa {step + 1} de 3</p>
+          <h1 className="mt-2 text-3xl">{steps[step]}</h1>
+        </div>
+        <div className="grid gap-8 lg:grid-cols-[1fr_250px]">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-8">
+            {Object.keys(errors).length > 0 && (
+              <div role="alert" className="mb-5 rounded-lg bg-destructive-soft p-3 text-sm text-destructive">
+                {errors.submit || errors.options || "Confira os campos indicados antes de continuar."}
+              </div>
+            )}
+
+            {step === 0 && (
+              <div className="space-y-6">
+                <ProfileSelector value={profile} onChange={(value) => { setProfile(value); setMunicipalityId(""); setRegionId(""); }} />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Nome completo" name="name" value={name} onChange={setName} error={errors.name} />
+                  <Field label="E-mail" name="email" type="email" value={email} onChange={setEmail} error={errors.email} />
+                  <div className="relative">
+                    <Field label="Senha" name="password" type={showPassword ? "text" : "password"} value={password} onChange={setPassword} error={errors.password} />
+                    <button type="button" className="absolute right-3 top-9 text-muted-foreground" onClick={() => setShowPassword(!showPassword)} aria-label="Mostrar ou ocultar senha">
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  <Field label="Confirmar senha" name="confirmPassword" type={showPassword ? "text" : "password"} value={confirmPassword} onChange={setConfirmPassword} error={errors.confirmPassword} />
+                </div>
+                <label className="block text-sm font-semibold">
+                  {profile === "produtor" ? "Município" : "Região imediata"}<span className="ml-1 text-destructive">*</span>
+                  <Select
+                    value={profile === "produtor" ? municipalityId : regionId}
+                    onValueChange={(value) => profile === "produtor" ? setMunicipalityId(value) : setRegionId(value)}
+                    disabled={optionsLoading}
+                  >
+                    <SelectTrigger className="mt-2 w-full font-normal" aria-invalid={Boolean(errors.location)}>
+                      <SelectValue placeholder={optionsLoading ? "Carregando..." : "Selecione"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {profile === "produtor"
+                        ? municipalities.map((item) => <SelectItem key={item.id} value={String(item.id)}>{item.nome}</SelectItem>)
+                        : regions.map((item) => <SelectItem key={item.regiaoImediataId} value={String(item.regiaoImediataId)}>{item.regiaoImediataNome}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  {errors.location && <span className="mt-1 block font-normal text-destructive">{errors.location}</span>}
+                </label>
+              </div>
+            )}
+
+            {step === 1 && (
+              <div className="rounded-xl border border-dashed border-border p-5">
+                <div className="flex gap-3">
+                  <UploadCloud className="mt-1 size-5 text-interactive" />
+                  <div>
+                    <p className="font-semibold">
+                      {profile === "produtor" ? "Documento CAF" : "Comprovante de registro profissional"}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {profile === "produtor"
+                        ? "Envie o Cadastro Nacional da Agricultura Familiar (CAF)."
+                        : "Envie o comprovante de registro no CREA ou no CFTA."}{" "}
+                      PDF, JPG ou PNG até 10 MB.
+                    </p>
+                  </div>
+                </div>
+                {document ? (
+                  <div className="mt-4 flex items-center gap-3 rounded-lg bg-muted p-3">
+                    {document.preview ? <ImageIcon className="text-success" /> : <FileText className="text-destructive" />}
+                    <span className="min-w-0 flex-1 truncate text-sm">{document.name}</span>
+                    <button type="button" onClick={() => setDocument(undefined)} className="rounded p-2 text-destructive" aria-label="Remover documento"><Trash2 size={18} /></button>
+                  </div>
+                ) : (
+                  <label className="mt-4 inline-flex min-h-11 cursor-pointer items-center rounded-md border border-interactive px-4 text-sm font-semibold text-interactive">
+                    <input className="sr-only" type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleFile} />Selecionar arquivo
+                  </label>
+                )}
+                {errors.document && <p className="mt-2 text-sm text-destructive">{errors.document}</p>}
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-4">
+                <p className="rounded-lg border border-warning bg-warning-soft p-4 text-sm">A conta ainda não será liberada. O administrador analisará estes dados e o documento antes de aprovar o acesso.</p>
+                {[
+                  ["Perfil", profileCopy[profile].label], ["Solicitante", `${name} · ${email}`],
+                  [profile === "produtor" ? "Município" : "Região imediata", selectedLocation || "—"],
+                  [profile === "produtor" ? "Documento CAF" : "Registro profissional (CREA ou CFTA)", document?.name || "—"],
+                ].map(([title, value]) => <div key={title} className="rounded-xl border border-border p-4"><h3 className="text-base">{title}</h3><p className="mt-1 text-sm text-muted-foreground">{value}</p></div>)}
+              </div>
+            )}
+
+            <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+              <Button variant="outline" disabled={step === 0} onClick={() => { setStep((current) => current - 1); setErrors({}); }}>Voltar</Button>
+              {step < 2 ? <Button onClick={advance}>Continuar</Button> : <Button onClick={() => setConfirm(true)}>Enviar solicitação</Button>}
+            </div>
+          </div>
+
+          <aside className="h-fit rounded-2xl border border-border bg-muted p-5 lg:sticky lg:top-6">
+            <p className="font-heading font-semibold">Progresso</p>
+            <ol className="mt-5 space-y-4">{steps.map((item, index) => <li key={item} className={`flex gap-3 text-sm ${index === step ? "font-semibold text-interactive" : index < step ? "text-success" : "text-muted-foreground"}`}><span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-current text-xs">{index < step ? "✓" : index + 1}</span>{item}</li>)}</ol>
+            <p className="mt-6 border-t border-border pt-5 text-sm text-muted-foreground">Após o envio, aguarde a decisão do administrador para entrar no sistema.</p>
+          </aside>
+        </div>
+      </section>
+
+      <Dialog open={confirm} onOpenChange={setConfirm}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Confirmar envio?</DialogTitle><DialogDescription>A solicitação ficará pendente até a análise administrativa.</DialogDescription></DialogHeader>
+          <DialogFooter><Button variant="outline" onClick={() => setConfirm(false)}>Continuar revisando</Button><Button disabled={sending} onClick={() => void submit()}>{sending ? "Enviando..." : "Confirmar e enviar"}</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </AccessShell>
+  );
 }

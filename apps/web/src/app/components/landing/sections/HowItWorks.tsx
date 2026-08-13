@@ -16,7 +16,7 @@ export function HowItWorks() {
         <div className='grid gap-12 lg:grid-cols-[.84fr_1.16fr] lg:items-center'>
           <div className='relative mx-auto w-full max-w-[510px] lg:mx-0'>
             <div className='relative aspect-[4/5] overflow-hidden rounded-[28px] border border-border shadow-lg'>
-              <Image src='/images/landing/login-ceara.webp' alt='Milho no Ceará recebendo chuva suave' fill sizes='(max-width: 1024px) 100vw, 42vw' className='object-cover' />
+              <Image src='/images/landing/caju-ceara.webp' alt='Cajueiro carregado de frutos após a chuva no Ceará' fill sizes='(max-width: 1024px) 100vw, 42vw' className='object-cover' />
               <div className='absolute inset-0 bg-gradient-to-t from-[#084C68]/75 via-transparent to-transparent' />
               <div className='absolute bottom-0 left-0 right-0 p-6 text-white sm:p-8'>
                 <Icon icon='solar:waterdrops-linear' width={28} aria-hidden='true' />

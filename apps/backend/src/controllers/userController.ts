@@ -16,6 +16,10 @@ export class UserController {
             // RECEBENDO OS DADOS COM PADRAO DA INTERFACE
             const data: IUser = request.body;
 
+            if (data.role === 'PRODUTOR' || data.role === 'TECNICO_COOPERATIVA') {
+                throw new AppError('Produtores e técnicos devem enviar uma solicitação de acesso', 403);
+            }
+
             // VERIFICANDO SE O EMAIL INFORMADO JA FOI CADASTRADO
             const userExists = await prisma.user.findUnique({
                 where: { email: data.email },

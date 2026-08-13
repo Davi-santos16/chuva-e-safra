@@ -12,7 +12,7 @@ import {
 function SentContent() {
   const p = useSearchParams(),
     [copied, setCopied] = useState(false),
-    protocol = "CSA-2026-000184",
+    protocol = p.get("protocolo") || "Protocolo indisponível",
     profile = (
       p.get("perfil") === "tecnico" ? "tecnico" : "produtor"
     ) as ProfileType,
@@ -81,8 +81,7 @@ function SentContent() {
           </div>
           <p className="mt-7 flex gap-2 rounded-lg border border-border p-4 text-left text-sm text-muted-foreground">
             <ShieldCheck className="size-5 shrink-0 text-interactive" />
-            Em uma versão integrada, as atualizações também poderão ser enviadas
-            para o seu e-mail.
+            Use o protocolo e o e-mail informado para acompanhar a análise.
           </p>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Button variant="outline" onClick={download}>

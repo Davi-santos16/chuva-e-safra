@@ -25,6 +25,7 @@ import {
   createAdmin,
   getAdminUsers,
 } from "@/services/admin";
+import { AccessRequestsPanel } from "./AccessRequestsPanel";
 
 const ROLE_LABELS: Record<UserRole, string> = {
   ADMIN: "Administrador",
@@ -170,6 +171,8 @@ export function AdminDashboard() {
           </CardBox>
         ))}
       </div>
+
+      <AccessRequestsPanel />
 
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.8fr)]">
         <CardBox className="min-w-0 p-0!">
