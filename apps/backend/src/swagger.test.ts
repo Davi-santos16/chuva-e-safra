@@ -12,6 +12,7 @@ test("documenta todas as rotas públicas do backend", () => {
   assert.ok(swaggerDocument.paths["/municipios/todos"].get);
   assert.ok(swaggerDocument.paths["/municipios"].get);
   assert.ok(swaggerDocument.paths["/analises"].get);
+  assert.ok(swaggerDocument.paths["/analises/culturas"].get);
   assert.ok(swaggerDocument.paths["/admin/users"].get);
   assert.ok(swaggerDocument.paths["/admin/users"].post);
 });
@@ -86,6 +87,9 @@ test("documenta autenticação JWT na rota de análises", () => {
     swaggerDocument.components.securitySchemes.bearerAuth.scheme,
     "bearer",
   );
+  assert.deepEqual(swaggerDocument.paths["/analises/culturas"].get.security, [
+    { bearerAuth: [] },
+  ]);
 });
 
 test("protege a gestão de usuários e não expõe ADMIN no cadastro público", () => {

@@ -124,17 +124,18 @@ export const Login = () => {
 
             <form className="mt-8" onSubmit={handleSubmit} noValidate>
               <div>
-                <Label htmlFor="login-identifier" className="font-semibold">
-                  E-mail ou CPF
+                <Label htmlFor="login-email" className="font-semibold">
+                  E-mail
                 </Label>
                 <Input
-                  id="login-identifier"
+                  id="login-email"
                   name="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  placeholder="danileilaleila@gmail.com"
+                  placeholder="seuemail@exemplo.com"
+                  type="email"
                   className="mt-2"
-                  autoComplete="username"
+                  autoComplete="email"
                   required
                 />
               </div>

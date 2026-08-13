@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
+import { isAxiosError } from "axios";
 
 import { api } from "@/api/config";
 import { prisma } from "@/database/prisma";
@@ -46,6 +47,28 @@ function codigosMunicipios(municipios: string) {
         .map(Number),
     ),
   ];
+}
+
+interface ApiDadosError {
+  detail?: string | Array<{ msg?: string }>;
+  message?: string;
+}
+
+function mensagemApiDados(error: unknown) {
+  if (!isAxiosError<ApiDadosError>(error)) return null;
+
+  const data = error.response?.data;
+  if (typeof data?.detail === "string") return data.detail;
+
+  if (Array.isArray(data?.detail)) {
+    const mensagens = data.detail
+      .map((item) => item.msg)
+      .filter((mensagem): mensagem is string => Boolean(mensagem));
+
+    if (mensagens.length > 0) return mensagens.join(" ");
+  }
+
+  return data?.message ?? null;
 }
 
 class AnalisesController {
@@ -138,7 +161,28 @@ class AnalisesController {
       params.uf = uf;
     }
 
-    const apiResponse = await api.get("/analises", { params });
+    let apiResponse;
+
+    try {
+      apiResponse = await api.get("/analises", { params });
+    } catch (error) {
+      if (!isAxiosError(error)) throw error;
+
+      const status = error.response?.status;
+      const mensagem = mensagemApiDados(error);
+
+      if (status && status >= 400 && status < 500) {
+        throw new AppError(
+          mensagem ?? "Os filtros informados não são aceitos pela base de análises.",
+          status,
+        );
+      }
+
+      throw new AppError(
+        "O serviço de dados agrícolas está indisponível no momento. Tente novamente mais tarde.",
+        502,
+      );
+    }
 
     return response.status(200).json({ data: apiResponse.data });
   }

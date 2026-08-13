@@ -303,8 +303,11 @@ Selecione abaixo o schema correspondente ao tipo de usuário para ver apenas os 
             in: "query",
             required: true,
             description: "Nome da cultura agrícola.",
-            schema: { type: "string", minLength: 1 },
-            example: "milho",
+            schema: {
+              type: "string",
+              enum: ["MILHO", "FEIJÃO", "ARROZ", "MANDIOCA", "BANANA", "COCO-DA-BAÍA"],
+            },
+            example: "MILHO",
           },
           {
             name: "de",
@@ -359,8 +362,62 @@ Selecione abaixo o schema correspondente ao tipo de usuário para ver apenas os 
               },
             },
           },
+          "422": {
+            description: "Os filtros não são aceitos pela base externa de análises.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/MessageResponse" },
+              },
+            },
+          },
+          "502": {
+            description: "O serviço externo de dados agrícolas está indisponível.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/MessageResponse" },
+              },
+            },
+          },
           "500": {
             $ref: "#/components/responses/InternalServerError",
+          },
+        },
+      },
+    },
+    "/analises/culturas": {
+      get: {
+        tags: ["Análises"],
+        summary: "Listar culturas disponíveis no recorte do usuário",
+        description:
+          "Consulta a tabela 5457 da Produção Agrícola Municipal no SIDRA/IBGE entre 2010 e 2021 e retorna somente as culturas compatíveis com o serviço de análises que possuem valor numérico no município, região imediata ou estado do usuário.",
+        operationId: "getAvailableCultures",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          "200": {
+            description: "Culturas com dados no recorte geográfico do usuário.",
+            content: {
+              "application/json": {
+                example: {
+                  culturas: [
+                    { code: 2711, label: "Milho (em grão)", value: "MILHO" },
+                    { code: 2702, label: "Feijão (em grão)", value: "FEIJÃO" },
+                  ],
+                },
+              },
+            },
+          },
+          "400": { $ref: "#/components/responses/BadRequest" },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": {
+            description: "O perfil não possui escopo de análise agrícola.",
+          },
+          "502": {
+            description: "Não foi possível consultar o SIDRA/IBGE.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/MessageResponse" },
+              },
+            },
           },
         },
       },

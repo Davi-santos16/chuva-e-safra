@@ -21,7 +21,9 @@ import {
 } from "@/components/ui/select";
 import {
   AnalysisChart,
+  AnalysisCulture,
   AnalysisData,
+  getAvailableCultures,
   getAnalyses,
 } from "@/services/analise";
 import {
@@ -32,19 +34,6 @@ import {
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
 const YEARS = Array.from({ length: 12 }, (_, index) => 2010 + index);
-
-const CULTURES = [
-  { code: 2711, label: "Milho (em grão)", value: "MILHO" },
-  { code: 2702, label: "Feijão (em grão)", value: "FEIJÃO" },
-  { code: 2692, label: "Arroz (em casca)", value: "ARROZ" },
-  { code: 2708, label: "Mandioca", value: "MANDIOCA" },
-  { code: 2713, label: "Soja (em grão)", value: "SOJA" },
-  { code: 2720, label: "Banana (cacho)", value: "BANANA" },
-  { code: 40473, label: "Caju", value: "CAJU" },
-  { code: 2727, label: "Coco-da-baía", value: "COCO-DA-BAÍA" },
-  { code: 2737, label: "Manga", value: "MANGA" },
-  { code: 2715, label: "Tomate", value: "TOMATE" },
-] as const;
 
 interface MunicipalityMultiSelectProps {
   municipalities: Municipality[];
@@ -262,12 +251,14 @@ const AUDIENCE_CONTENT = {
 } as const;
 
 function AgriculturalAnalyses({ audience }: { audience: AnalysisAudience }) {
-  const [culture, setCulture] = useState("MILHO");
+  const [cultures, setCultures] = useState<AnalysisCulture[]>([]);
+  const [culture, setCulture] = useState("");
   const [fromYear, setFromYear] = useState(2010);
   const [toYear, setToYear] = useState(2021);
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingCultures, setIsLoadingCultures] = useState(true);
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
   const [selectedMunicipalityIds, setSelectedMunicipalityIds] = useState<number[]>([]);
   const [isLoadingMunicipalities, setIsLoadingMunicipalities] = useState(
@@ -302,6 +293,40 @@ function AgriculturalAnalyses({ audience }: { audience: AnalysisAudience }) {
     [audience],
   );
 
+  const loadCultures = useCallback(async () => {
+    setIsLoadingCultures(true);
+    setError(null);
+
+    try {
+      const availableCultures = await getAvailableCultures();
+      setCultures(availableCultures);
+
+      const initialCulture =
+        availableCultures.find(({ value }) => value === "MILHO") ?? availableCultures[0];
+
+      if (!initialCulture) {
+        setCulture("");
+        setError("O IBGE não possui culturas com dados para a sua região entre 2010 e 2021.");
+        return null;
+      }
+
+      setCulture(initialCulture.value);
+      return initialCulture.value;
+    } catch (requestError) {
+      setCultures([]);
+      setCulture("");
+      setError(
+        getErrorMessage(
+          requestError,
+          "Não foi possível carregar as culturas disponíveis no IBGE. Tente novamente.",
+        ),
+      );
+      return null;
+    } finally {
+      setIsLoadingCultures(false);
+    }
+  }, []);
+
   const loadMunicipalities = useCallback(async () => {
     setIsLoadingMunicipalities(true);
     setError(null);
@@ -317,7 +342,13 @@ function AgriculturalAnalyses({ audience }: { audience: AnalysisAudience }) {
         return;
       }
 
-      await loadAnalysis("MILHO", 2010, 2021, municipalityIds);
+      const initialCulture = await loadCultures();
+      if (!initialCulture) {
+        setIsLoading(false);
+        return;
+      }
+
+      await loadAnalysis(initialCulture, 2010, 2021, municipalityIds);
     } catch (requestError) {
       setError(
         getErrorMessage(
@@ -329,19 +360,33 @@ function AgriculturalAnalyses({ audience }: { audience: AnalysisAudience }) {
     } finally {
       setIsLoadingMunicipalities(false);
     }
-  }, [loadAnalysis]);
+  }, [loadAnalysis, loadCultures]);
 
-  useEffect(() => {
+  const initializeAnalysis = useCallback(async () => {
     if (audience === "technician") {
-      void loadMunicipalities();
+      await loadMunicipalities();
       return;
     }
 
-    void loadAnalysis("MILHO", 2010, 2021);
-  }, [audience, loadAnalysis, loadMunicipalities]);
+    const initialCulture = await loadCultures();
+    if (!initialCulture) {
+      setIsLoading(false);
+      return;
+    }
+
+    await loadAnalysis(initialCulture, 2010, 2021);
+  }, [audience, loadAnalysis, loadCultures, loadMunicipalities]);
+
+  useEffect(() => {
+    void initializeAnalysis();
+  }, [initializeAnalysis]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!culture) {
+      setError("Nenhuma cultura está disponível para este recorte.");
+      return;
+    }
     void loadAnalysis(culture, fromYear, toYear, selectedMunicipalityIds);
   }
 
@@ -384,6 +429,7 @@ function AgriculturalAnalyses({ audience }: { audience: AnalysisAudience }) {
     ...commonKpis.slice(2),
   ];
   const kpiCards = audience === "producer" ? commonKpis : managerKpis;
+  const hasNoData = Boolean(analysis && analysis.kpis.total_municipios === 0);
   const visibleCharts = (analysis?.graficos ?? []).map((chart) =>
     audience === "producer" && chart.codigo === "ranking"
       ? { ...chart, titulo: "Produtividade do seu município" }
@@ -412,12 +458,20 @@ function AgriculturalAnalyses({ audience }: { audience: AnalysisAudience }) {
             <label htmlFor="culture-filter" className="text-sm font-semibold">
               Cultura
             </label>
-            <Select value={culture} onValueChange={setCulture}>
+            <Select
+              value={culture}
+              onValueChange={setCulture}
+              disabled={isLoadingCultures || cultures.length === 0}
+            >
               <SelectTrigger id="culture-filter" className="w-full">
-                <SelectValue placeholder="Selecione uma cultura" />
+                <SelectValue
+                  placeholder={
+                    isLoadingCultures ? "Consultando culturas no IBGE..." : "Selecione uma cultura"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                {CULTURES.map((item) => (
+                {cultures.map((item) => (
                   <SelectItem key={item.code} value={item.value}>
                     {item.label}
                   </SelectItem>
@@ -494,21 +548,27 @@ function AgriculturalAnalyses({ audience }: { audience: AnalysisAudience }) {
               type="submit"
               disabled={
                 isLoading ||
+                isLoadingCultures ||
                 isLoadingMunicipalities ||
+                !culture ||
                 (audience === "technician" && selectedMunicipalityIds.length === 0)
               }
-              aria-busy={isLoading || isLoadingMunicipalities}
+              aria-busy={isLoading || isLoadingCultures || isLoadingMunicipalities}
             >
               <Icon
                 icon={
-                  isLoading || isLoadingMunicipalities
+                  isLoading || isLoadingCultures || isLoadingMunicipalities
                     ? "solar:refresh-linear"
                     : "solar:filter-linear"
                 }
-                className={isLoading || isLoadingMunicipalities ? "animate-spin" : ""}
+                className={
+                  isLoading || isLoadingCultures || isLoadingMunicipalities ? "animate-spin" : ""
+                }
                 aria-hidden="true"
               />
-              {isLoading || isLoadingMunicipalities ? "Carregando..." : "Aplicar filtros"}
+              {isLoading || isLoadingCultures || isLoadingMunicipalities
+                ? "Carregando..."
+                : "Aplicar filtros"}
             </Button>
             <p className="text-sm text-muted-foreground">
               Período disponível: 2010 a 2021. {content.scopeDescription}
@@ -528,8 +588,8 @@ function AgriculturalAnalyses({ audience }: { audience: AnalysisAudience }) {
               variant="outlineerror"
               size="sm"
               onClick={() => {
-                if (audience === "technician" && municipalities.length === 0) {
-                  void loadMunicipalities();
+                if (cultures.length === 0 || (audience === "technician" && municipalities.length === 0)) {
+                  void initializeAnalysis();
                   return;
                 }
                 void loadAnalysis(culture, fromYear, toYear, selectedMunicipalityIds);
@@ -549,6 +609,18 @@ function AgriculturalAnalyses({ audience }: { audience: AnalysisAudience }) {
         </div>
       ) : analysis ? (
         <>
+          {hasNoData && (
+            <Alert variant="lightinfo">
+              <Icon icon="solar:info-circle-linear" aria-hidden="true" />
+              <AlertTitle>Nenhum dado encontrado</AlertTitle>
+              <AlertDescription>
+                Não há registros de {analysis.filtros.cultura.toLocaleLowerCase("pt-BR")} para este
+                recorte entre {analysis.filtros.de} e {analysis.filtros.ate}. Tente outra cultura ou
+                período.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div
             className={
               audience === "producer"

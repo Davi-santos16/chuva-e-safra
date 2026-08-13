@@ -7,6 +7,12 @@ export interface AnalysisFilters {
   municipios?: string;
 }
 
+export interface AnalysisCulture {
+  code: number;
+  label: string;
+  value: string;
+}
+
 export interface AnalysisKpis {
   total_municipios: number;
   total_culturas: number;
@@ -43,6 +49,15 @@ export interface AnalysisData {
 
 interface AnalysisResponse {
   data: AnalysisData;
+}
+
+interface CulturesResponse {
+  culturas: AnalysisCulture[];
+}
+
+export async function getAvailableCultures() {
+  const response = await api.get<CulturesResponse>("/analises/culturas");
+  return response.data.culturas;
 }
 
 export async function getAnalyses(filters: AnalysisFilters) {

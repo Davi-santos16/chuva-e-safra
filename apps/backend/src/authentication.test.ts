@@ -263,3 +263,43 @@ test("monta os filtros de análise conforme o perfil", async () => {
     api.get = originalApiGet;
   }
 });
+
+test("preserva a mensagem de validação retornada pela API de análises", async () => {
+  const originalFindUnique = prisma.user.findUnique;
+  const originalApiGet = api.get;
+
+  prisma.user.findUnique = (async () => ({
+    role: "GESTOR_PUBLICO",
+    municipio: null,
+    regiaoImediataId: null,
+    uf: "CE",
+  })) as unknown as typeof prisma.user.findUnique;
+  api.get = (async () => {
+    throw {
+      isAxiosError: true,
+      response: {
+        status: 422,
+        data: { detail: "Cultura 'SOJA' não reconhecida na base." },
+      },
+    };
+  }) as typeof api.get;
+
+  try {
+    await assert.rejects(
+      () =>
+        new AnalisesController().index(
+          {
+            query: { cultura: "SOJA", de: "2010", ate: "2021" },
+            user: { id: "gestor-123", role: "GESTOR_PUBLICO" },
+          } as unknown as Request,
+          responseMock() as unknown as Response,
+        ),
+      (error: { message?: string; statusCode?: number }) =>
+        error.statusCode === 422 &&
+        error.message === "Cultura 'SOJA' não reconhecida na base.",
+    );
+  } finally {
+    prisma.user.findUnique = originalFindUnique;
+    api.get = originalApiGet;
+  }
+});
