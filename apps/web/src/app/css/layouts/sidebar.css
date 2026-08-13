@@ -1,0 +1,38 @@
+/* Brand-aligned overrides for the existing tailwind-sidebar package. */
+[data-slot='sidebar'] [data-slot='sidebar-menu-button'],
+[data-slot='sidebar'] .side_sub {
+  min-height: 44px;
+  border-radius: var(--radius-md);
+}
+
+[data-slot='sidebar']
+  [data-slot='sidebar-menu-item']
+  [data-slot='sidebar-menu-button']:not([data-active='true']):hover,
+[data-slot='sidebar'] [data-slot='collapsible-trigger']:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--sidebar-foreground) 10%,
+    transparent
+  ) !important;
+}
+
+[data-slot='sidebar'] .brand-logo a {
+  border-radius: var(--radius-sm);
+}
+
+[data-slot='sidebar'] .brand-logo a:focus-visible {
+  outline: 2px solid var(--sidebar-foreground);
+  outline-offset: 4px;
+}
+
+[data-slot='badge'] {
+  font-size: x-small;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='sidebar'] * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

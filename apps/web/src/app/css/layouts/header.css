@@ -1,0 +1,21 @@
+.app-header {
+    transition: box-shadow 200ms ease-in-out, border-color 200ms ease-in-out;
+}
+
+.mobile-header-menu {
+    height: 0;
+    overflow: hidden;
+    transition: height 200ms ease-in-out;
+}
+
+.mobile-header-menu.active {
+    min-height: 70px;
+    overflow: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-header,
+    .mobile-header-menu {
+        transition: none;
+    }
+}

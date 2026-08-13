@@ -1,0 +1,77 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../prisma/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  PRODUTOR
+  TECNICO_COOPERATIVA
+  GESTOR_PUBLICO
+  ADMIN
+}
+
+enum AccessRequestStatus {
+  PENDENTE
+  APROVADA
+  RECUSADA
+}
+
+model Municipio {
+  id                 Int    @id
+  nome               String
+  regiaoImediataId   Int    @map("regiao_imediata_id")
+  regiaoImediataNome String @map("regiao_imediata_nome")
+  accessRequests     AccessRequest[]
+
+  @@index([nome])
+  @@index([regiaoImediataId])
+  @@map("municipios")
+}
+
+model User {
+  id               String   @id @default(uuid())
+  name             String
+  email            String   @unique
+  password         String
+  role             UserRole
+  municipio        String?
+  regiaoImediataId Int?     @map("regiao_imediata_id")
+  uf               String?
+
+  createdAT DateTime  @default(now()) @map("created_at")
+  updatedAT DateTime? @updatedAt @map("updated_at")
+
+  @@index([regiaoImediataId])
+  @@map("users")
+}
+
+model AccessRequest {
+  id                 String              @id @default(uuid())
+  protocol           String              @unique
+  name               String
+  email              String              @unique
+  passwordHash       String              @map("password_hash")
+  role               UserRole
+  municipioId        Int?                @map("municipio_id")
+  regiaoImediataId   Int?                @map("regiao_imediata_id")
+  documentName       String              @map("document_name")
+  documentMimeType   String              @map("document_mime_type")
+  documentData       Bytes               @map("document_data")
+  status             AccessRequestStatus @default(PENDENTE)
+  rejectionReason    String?             @map("rejection_reason")
+  reviewedBy         String?             @map("reviewed_by")
+  reviewedAt         DateTime?           @map("reviewed_at")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+
+  municipio Municipio? @relation(fields: [municipioId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([regiaoImediataId])
+  @@map("access_requests")
+}

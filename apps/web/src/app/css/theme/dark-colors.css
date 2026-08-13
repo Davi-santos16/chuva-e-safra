@@ -1,0 +1,72 @@
+.dark {
+  --background: var(--background-dark);
+  --foreground: var(--brand-mist);
+
+  --card: var(--surface-dark);
+  --card-foreground: var(--brand-mist);
+  --popover: var(--surface-dark);
+  --popover-foreground: var(--brand-mist);
+
+  --primary: var(--brand-rain);
+  --primary-foreground: var(--brand-white);
+  --primary-hover: var(--rain-highlight);
+  --interactive: var(--ring);
+  --interactive-hover: color-mix(in oklab, var(--ring) 82%, var(--foreground));
+
+  --secondary: #174B57;
+  --secondary-foreground: var(--brand-mist);
+  --secondary-hover: color-mix(in oklab, var(--secondary) 78%, var(--foreground));
+  --muted: var(--brand-ink);
+  --muted-foreground: var(--text-secondary-dark);
+
+  --accent: #5E4A1C;
+  --accent-foreground: var(--brand-mist);
+
+  --success: var(--brand-sprout);
+  --success-foreground: var(--background-dark);
+  --success-soft: #1C4B39;
+  --success-hover: color-mix(in oklab, var(--success) 84%, var(--foreground));
+
+  --warning: var(--brand-gold);
+  --warning-foreground: var(--brand-ink);
+  --warning-soft: #4F421F;
+  --warning-hover: color-mix(in oklab, var(--warning) 84%, var(--foreground));
+
+  --destructive: #E06B6B;
+  --destructive-foreground: var(--background-dark);
+  --destructive-soft: #542F34;
+  --destructive-hover: color-mix(in oklab, var(--destructive) 84%, var(--foreground));
+
+  --info: var(--primary);
+  --info-foreground: var(--primary-foreground);
+  --info-soft: var(--secondary);
+  --info-hover: var(--primary-hover);
+
+  --correction-foreground: var(--background-dark);
+  --border: var(--border-dark);
+  --input: #37666E;
+  --ring: #75BFE0;
+  --overlay: color-mix(in srgb, var(--background-dark) 72%, transparent);
+
+  --sidebar: #082A34;
+  --sidebar-foreground: var(--brand-mist);
+  --sidebar-active: var(--brand-rain);
+  --sidebar-active-foreground: var(--brand-white);
+  --sidebar-primary: var(--sidebar-active);
+  --sidebar-primary-foreground: var(--sidebar-active-foreground);
+  --sidebar-accent: var(--sidebar-active);
+  --sidebar-accent-foreground: var(--sidebar-active-foreground);
+  --sidebar-border: var(--border-dark);
+  --sidebar-ring: var(--ring);
+
+  --chart-1: var(--brand-rain);
+  --chart-2: var(--rain-highlight);
+  --chart-3: var(--brand-harvest);
+  --chart-4: var(--brand-sprout);
+  --chart-5: var(--brand-gold);
+  --chart-critical: var(--destructive);
+  --chart-neutral: var(--muted-foreground);
+
+  /* Dynamic compatibility aliases. */
+  --legacy-dark: var(--card);
+}
