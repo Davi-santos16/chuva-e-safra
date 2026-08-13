@@ -5,11 +5,11 @@ import { z } from "zod";
 import { prisma } from "@/database/prisma";
 import { AppError } from "@/utils/AppError";
 
-const createAdminSchema = z.object({
+const createManagedUserSchema = z.object({
   name: z.string().trim().min(3, "Nome deve ter pelo menos 3 caracteres").max(100),
   email: z.email("E-mail inválido").transform((email) => email.toLowerCase()),
   password: z.string().min(8, "Senha deve ter pelo menos 8 caracteres"),
-  role: z.literal("ADMIN").default("ADMIN"),
+  role: z.enum(["ADMIN", "GESTOR_PUBLICO"]),
 });
 
 class AdminUsersController {
@@ -49,7 +49,7 @@ class AdminUsersController {
   }
 
   async create(request: Request, response: Response) {
-    const data = createAdminSchema.parse(request.body);
+    const data = createManagedUserSchema.parse(request.body);
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },
       select: { id: true },
@@ -65,10 +65,10 @@ class AdminUsersController {
         name: data.name,
         email: data.email,
         password,
-        role: "ADMIN",
+        role: data.role,
         municipio: null,
         regiaoImediataId: null,
-        uf: null,
+        uf: data.role === "GESTOR_PUBLICO" ? "CE" : null,
       },
       select: {
         id: true,
@@ -80,7 +80,10 @@ class AdminUsersController {
     });
 
     return response.status(201).json({
-      message: "Administrador criado com sucesso",
+      message:
+        data.role === "GESTOR_PUBLICO"
+          ? "Gestor público criado com sucesso"
+          : "Administrador criado com sucesso",
       user,
     });
   }

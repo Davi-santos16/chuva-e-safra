@@ -132,11 +132,45 @@ function AnalysisChartCard({ chart }: { chart: AnalysisChart }) {
   const isDark = resolvedTheme === "dark";
 
   const apiLayout = chart.figura.layout as Partial<Layout>;
+  const apiMargin = apiLayout.margin ?? {};
+  const apiLegend = apiLayout.legend ?? {};
+  const apiXAxis = apiLayout.xaxis ?? {};
+  const apiYAxis = apiLayout.yaxis ?? {};
+  const chartHeight = Math.max(Number(apiLayout.height) || 0, 500);
   const layout: Partial<Layout> = {
     ...apiLayout,
     title: undefined,
     autosize: true,
-    height: 360,
+    height: chartHeight,
+    margin: {
+      ...apiMargin,
+      t: 32,
+      b: Math.max(Number(apiMargin.b) || 0, 130),
+    },
+    xaxis: {
+      ...apiXAxis,
+      automargin: true,
+      title: {
+        ...(typeof apiXAxis.title === "object" ? apiXAxis.title : {}),
+        standoff: 18,
+      },
+    },
+    yaxis: {
+      ...apiYAxis,
+      automargin: true,
+      title: {
+        ...(typeof apiYAxis.title === "object" ? apiYAxis.title : {}),
+        standoff: 18,
+      },
+    },
+    legend: {
+      ...apiLegend,
+      orientation: "h",
+      x: 0.5,
+      xanchor: "center",
+      y: -0.22,
+      yanchor: "top",
+    },
     paper_bgcolor: "rgba(0,0,0,0)",
     plot_bgcolor: "rgba(0,0,0,0)",
     font: {
@@ -166,7 +200,7 @@ function AnalysisChartCard({ chart }: { chart: AnalysisChart }) {
           layout={layout}
           config={config}
           useResizeHandler
-          style={{ width: "100%", height: "360px" }}
+          style={{ width: "100%", height: `${chartHeight}px` }}
         />
       </div>
     </CardBox>
@@ -350,6 +384,11 @@ function AgriculturalAnalyses({ audience }: { audience: AnalysisAudience }) {
     ...commonKpis.slice(2),
   ];
   const kpiCards = audience === "producer" ? commonKpis : managerKpis;
+  const visibleCharts = (analysis?.graficos ?? []).map((chart) =>
+    audience === "producer" && chart.codigo === "ranking"
+      ? { ...chart, titulo: "Produtividade do seu município" }
+      : chart,
+  );
 
   return (
     <div className="space-y-6">
@@ -533,7 +572,7 @@ function AgriculturalAnalyses({ audience }: { audience: AnalysisAudience }) {
           </div>
 
           <div className="grid gap-6 xl:grid-cols-2">
-            {analysis.graficos.map((chart, index) => (
+            {visibleCharts.map((chart, index) => (
               <div
                 key={chart.codigo}
                 className={index === 0 ? "xl:col-span-2" : undefined}

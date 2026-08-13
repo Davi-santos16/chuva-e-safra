@@ -11,6 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -21,8 +28,8 @@ import {
 import type { UserRole } from "@/lib/auth/types";
 import {
   AdminUsersData,
-  CreateAdminInput,
-  createAdmin,
+  CreateManagedUserInput,
+  createManagedUser,
   getAdminUsers,
 } from "@/services/admin";
 import { AccessRequestsPanel } from "./AccessRequestsPanel";
@@ -41,7 +48,12 @@ const ROLE_BADGES: Record<UserRole, "primary" | "success" | "info" | "warning"> 
   GESTOR_PUBLICO: "warning",
 };
 
-const EMPTY_FORM: CreateAdminInput = { name: "", email: "", password: "" };
+const EMPTY_FORM: CreateManagedUserInput = {
+  name: "",
+  email: "",
+  password: "",
+  role: "GESTOR_PUBLICO",
+};
 
 function errorMessage(error: unknown, fallback: string) {
   if (isAxiosError<{ message?: string | string[] }>(error)) {
@@ -54,7 +66,7 @@ function errorMessage(error: unknown, fallback: string) {
 
 export function AdminDashboard() {
   const [data, setData] = useState<AdminUsersData | null>(null);
-  const [form, setForm] = useState<CreateAdminInput>(EMPTY_FORM);
+  const [form, setForm] = useState<CreateManagedUserInput>(EMPTY_FORM);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -78,7 +90,7 @@ export function AdminDashboard() {
     void loadUsers();
   }, [loadUsers]);
 
-  async function handleCreateAdmin(event: FormEvent<HTMLFormElement>) {
+  async function handleCreateUser(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setFormError(null);
     setSuccess(null);
@@ -94,12 +106,12 @@ export function AdminDashboard() {
 
     setIsCreating(true);
     try {
-      const result = await createAdmin(form);
+      const result = await createManagedUser(form);
       setSuccess(result.message);
       setForm(EMPTY_FORM);
       await loadUsers();
     } catch (error) {
-      setFormError(errorMessage(error, "Não foi possível criar o administrador."));
+      setFormError(errorMessage(error, "Não foi possível criar o usuário."));
     } finally {
       setIsCreating(false);
     }
@@ -132,7 +144,7 @@ export function AdminDashboard() {
           </p>
           <h1>Controle de acessos</h1>
           <p className="mt-2 max-w-3xl text-muted-foreground">
-            Acompanhe as contas da plataforma e provisione administradores autorizados.
+            Acompanhe as contas da plataforma e provisione gestores e administradores autorizados.
           </p>
         </div>
         <div className="flex w-fit items-center gap-3 rounded-full border border-primary/20 bg-secondary px-4 py-2 text-sm font-semibold text-secondary-foreground">
@@ -247,8 +259,8 @@ export function AdminDashboard() {
               <Icon icon="solar:user-plus-linear" className="text-xl" aria-hidden="true" />
             </span>
             <div>
-              <h2 className="text-lg font-semibold">Novo administrador</h2>
-              <p className="text-sm text-muted-foreground">Crie outro acesso administrativo</p>
+              <h2 className="text-lg font-semibold">Novo acesso interno</h2>
+              <p className="text-sm text-muted-foreground">Cadastre um gestor público ou administrador</p>
             </div>
           </div>
 
@@ -263,7 +275,29 @@ export function AdminDashboard() {
             </Alert>
           )}
 
-          <form onSubmit={handleCreateAdmin} className="space-y-4">
+          <form onSubmit={handleCreateUser} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="managed-user-role">Perfil</Label>
+              <Select
+                value={form.role}
+                onValueChange={(role: CreateManagedUserInput["role"]) =>
+                  setForm((current) => ({ ...current, role }))
+                }
+              >
+                <SelectTrigger id="managed-user-role" className="w-full">
+                  <SelectValue placeholder="Selecione o perfil" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="GESTOR_PUBLICO">Gestor público</SelectItem>
+                  <SelectItem value="ADMIN">Administrador</SelectItem>
+                </SelectContent>
+              </Select>
+              {form.role === "GESTOR_PUBLICO" && (
+                <p className="text-xs text-muted-foreground">
+                  O gestor terá acesso ao panorama agrícola de todo o Ceará.
+                </p>
+              )}
+            </div>
             <div className="space-y-2">
               <Label htmlFor="admin-name">Nome completo</Label>
               <Input
@@ -304,7 +338,11 @@ export function AdminDashboard() {
                 className={isCreating ? "animate-spin" : ""}
                 aria-hidden="true"
               />
-              {isCreating ? "Criando..." : "Criar administrador"}
+              {isCreating
+                ? "Criando..."
+                : form.role === "GESTOR_PUBLICO"
+                  ? "Criar gestor público"
+                  : "Criar administrador"}
             </Button>
           </form>
         </CardBox>

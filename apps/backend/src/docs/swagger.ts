@@ -385,27 +385,27 @@ Selecione abaixo o schema correspondente ao tipo de usuário para ver apenas os 
       },
       post: {
         tags: ["Administração"],
-        summary: "Criar outro administrador",
+        summary: "Criar gestor público ou administrador",
         description:
-          "Provisiona uma nova conta administrativa. A rota pública de cadastro não aceita ADMIN.",
-        operationId: "createAdminUser",
+          "Provisiona uma conta interna como gestor público do Ceará ou administrador. Requer um JWT com role ADMIN.",
+        operationId: "createManagedUser",
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
           content: {
             "application/json": {
-              schema: { $ref: "#/components/schemas/CreateAdminRequest" },
+              schema: { $ref: "#/components/schemas/CreateManagedUserRequest" },
               example: {
-                name: "Administrador da plataforma",
-                email: "admin@example.com",
+                name: "Gestora estadual",
+                email: "gestora@example.com",
                 password: "senha-segura",
-                role: "ADMIN",
+                role: "GESTOR_PUBLICO",
               },
             },
           },
         },
         responses: {
-          "201": { description: "Administrador criado com sucesso." },
+          "201": { description: "Gestor público ou administrador criado com sucesso." },
           "400": { $ref: "#/components/responses/BadRequest" },
           "401": { $ref: "#/components/responses/Unauthorized" },
           "403": { description: "A rota é exclusiva para administradores." },
@@ -585,15 +585,15 @@ Selecione abaixo o schema correspondente ao tipo de usuário para ver apenas os 
         },
         additionalProperties: false,
       },
-      CreateAdminRequest: {
-        title: "Criação protegida de administrador",
+      CreateManagedUserRequest: {
+        title: "Criação protegida de gestor público ou administrador",
         type: "object",
         required: ["name", "email", "password", "role"],
         properties: {
           name: { type: "string", minLength: 3, maxLength: 100 },
           email: { type: "string", format: "email" },
           password: { type: "string", format: "password", minLength: 8, writeOnly: true },
-          role: { type: "string", enum: ["ADMIN"] },
+          role: { type: "string", enum: ["GESTOR_PUBLICO", "ADMIN"] },
         },
         additionalProperties: false,
       },

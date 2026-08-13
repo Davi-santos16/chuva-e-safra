@@ -23,10 +23,11 @@ export interface AdminUsersData {
   users: AdminUser[];
 }
 
-export interface CreateAdminInput {
+export interface CreateManagedUserInput {
   name: string;
   email: string;
   password: string;
+  role: "ADMIN" | "GESTOR_PUBLICO";
 }
 
 export async function getAdminUsers() {
@@ -34,10 +35,10 @@ export async function getAdminUsers() {
   return response.data;
 }
 
-export async function createAdmin(input: CreateAdminInput) {
+export async function createManagedUser(input: CreateManagedUserInput) {
   const response = await api.post<{ message: string; user: AdminUser }>(
     "/admin/users",
-    { ...input, role: "ADMIN" },
+    input,
   );
   return response.data;
 }
