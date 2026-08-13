@@ -8,8 +8,8 @@ const swaggerDocument = {
   },
   servers: [
     {
-      url: "http://localhost:3333",
-      description: "Ambiente local",
+      url: "/",
+      description: "Servidor atual",
     },
   ],
   tags: [

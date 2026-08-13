@@ -5,6 +5,7 @@ import { swaggerDocument } from "@/docs/swagger";
 
 test("documenta todas as rotas públicas do backend", () => {
   assert.equal(swaggerDocument.openapi, "3.0.3");
+  assert.equal(swaggerDocument.servers[0].url, "/");
   assert.ok(swaggerDocument.paths["/auth/register"].post);
   assert.ok(swaggerDocument.paths["/auth/login"].post);
   assert.ok(swaggerDocument.paths["/me"].get);
