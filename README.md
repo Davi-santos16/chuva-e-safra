@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./apps/web/public/logos/logo-horizontal-light.svg" alt="Chuva & Safra" width="260" />
+  <img src="./apps/web/public/logos/logo-horizontal-dark.svg" alt="Chuva & Safra" width="260" />
 
   <h3>Inteligência agrícola para decisões mais seguras no campo</h3>
 
@@ -110,54 +110,33 @@ regras de acesso, consultas agrícolas e persistência dos dados por meio do Pri
 
 <h2>Tecnologias</h2>
 
-<kbd>
-  <kbd>Front-end</kbd>
-  <br><br>
-  <p align="center">
-    <img
-      src="https://skillicons.dev/icons?i=nextjs,react,ts,tailwind,radix&perline=5"
-      width="325"
-      alt="Next.js, React, TypeScript, Tailwind CSS e Radix UI"
-    />
-    <br><br>
+<p align="center">
+  <kbd>
+    <kbd>Front-end</kbd>
+    <br /><br />
+    <img src="https://skillicons.dev/icons?i=nextjs,react,ts,tailwind,radix&perline=5" width="300" alt="Next.js, React, TypeScript, Tailwind CSS e Radix UI" />
+    <br /><br />
     <img src="https://cdn.simpleicons.org/axios/5A29E4" width="48" height="48" alt="Axios" title="Axios" />
     &nbsp;&nbsp;
     <img src="https://cdn.simpleicons.org/plotly/3F4F75" width="48" height="48" alt="Plotly.js" title="Plotly.js" />
-  </p>
-</kbd>
-
-<br><br>
-
-<kbd>
-  <kbd>Back-end</kbd>
-  <br><br>
-  <p align="center">
-    <img
-      src="https://skillicons.dev/icons?i=nodejs,express,ts,prisma,postgres&perline=5"
-      width="325"
-      alt="Node.js, Express, TypeScript, Prisma e PostgreSQL"
-    />
-    <br><br>
+  </kbd>
+  &nbsp;
+  <kbd>
+    <kbd>Back-end</kbd>
+    <br /><br />
+    <img src="https://skillicons.dev/icons?i=nodejs,express,ts,prisma,postgres&perline=5" width="300" alt="Node.js, Express, TypeScript, Prisma e PostgreSQL" />
+    <br /><br />
     <img src="https://cdn.simpleicons.org/zod/3E67B1" width="48" height="48" alt="Zod" title="Zod" />
     &nbsp;&nbsp;
     <img src="https://cdn.simpleicons.org/jsonwebtokens/000000" width="48" height="48" alt="JSON Web Token" title="JSON Web Token" />
-  </p>
-</kbd>
-
-<br><br>
-
-<kbd>
-  <kbd>Dados e integrações</kbd>
-  <br><br>
-  <p align="center">
-    <img
-      src="https://skillicons.dev/icons?i=supabase,postgres&perline=2"
-      width="130"
-      alt="Supabase e PostgreSQL"
-    />
-  </p>
-</kbd>
-
+  </kbd>
+  &nbsp;
+  <kbd>
+    <kbd>Dados e integrações</kbd>
+    <br /><br />
+    <img src="https://skillicons.dev/icons?i=supabase,postgres&perline=2" width="120" alt="Supabase e PostgreSQL" />
+  </kbd>
+</p>
 ## Infraestrutura
 
 <table>
