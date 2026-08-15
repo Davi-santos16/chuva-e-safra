@@ -137,6 +137,7 @@ regras de acesso, consultas agrícolas e persistência dos dados por meio do Pri
     <img src="https://skillicons.dev/icons?i=supabase,postgres&perline=2" width="120" alt="Supabase e PostgreSQL" />
   </kbd>
 </p>
+
 ## Infraestrutura
 
 <table>
