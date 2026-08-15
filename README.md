@@ -1,159 +1,252 @@
-# Chuva e Safra
+<div align="center">
+  <img src="./apps/web/public/logos/logo-horizontal-light.svg" alt="Chuva & Safra" width="260" />
 
-Aplicação web organizada como um **monorepo**, com frontend e backend no mesmo repositório.
+  <h3>Inteligência agrícola para decisões mais seguras no campo</h3>
 
-## Tecnologias
+  <p>
+    Uma plataforma que reúne dados de chuva, produtividade e território para
+    apoiar produtores rurais, técnicos agrícolas e gestores públicos do Ceará.
+  </p>
 
-- **Frontend:** Next.js, React, TypeScript e Tailwind CSS
-- **Backend:** Node.js, Express e TypeScript
-- **Banco de dados:** PostgreSQL com Prisma ORM
-- **Gerenciador de pacotes:** npm workspaces
+  <p>
+    <img src="https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" />
+    <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
+    <img src="https://img.shields.io/badge/Node.js-20-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" />
+    <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  </p>
+</div>
 
-## Estrutura do projeto
+---
+
+## Prévia da aplicação
+
+<p align="center">
+  <img src="./apps/web/public/images/chuva-e-safra.gif" alt="Demonstração da plataforma Chuva & Safra" width="900" />
+</p>
+
+## Sobre o projeto
+
+O **Chuva & Safra** é uma plataforma de análise agrícola criada para transformar
+dados climáticos e produtivos em informações acessíveis para quem atua no campo.
+O sistema considera o território e o perfil de cada usuário para entregar recortes
+compatíveis com sua área de atuação.
+
+A aplicação atende quatro perfis:
+
+- **Produtor rural:** acompanha informações do município associado ao cadastro.
+- **Técnico agrícola:** compara municípios pertencentes à sua região imediata.
+- **Gestor público:** visualiza o panorama agrícola do estado do Ceará.
+- **Administrador:** gerencia usuários e solicitações de acesso.
+
+## Principais funcionalidades
+
+- Autenticação com JWT e segregação de acesso por perfil.
+- Solicitação de acesso para produtores e técnicos.
+- Aprovação e recusa de solicitações pela área administrativa.
+- Consulta do andamento da solicitação por protocolo.
+- Análises de chuva, produtividade e culturas agrícolas.
+- Filtros por cultura, período, município e região de atuação.
+- Visualizações interativas e indicadores agrícolas.
+- Integração com dados territoriais e agrícolas do IBGE/SIDRA.
+- Interface responsiva alinhada à identidade visual do Chuva & Safra.
+
+## Fluxo de solicitação e acesso
+
+```mermaid
+flowchart TD
+    A[Landing page] --> B[Solicitar acesso]
+    B --> C{Escolher perfil}
+    C -->|Produtor rural| D[Informar dados, senha e município]
+    C -->|Técnico agrícola| E[Informar dados, senha e região imediata]
+    D --> F[Enviar documento CAF]
+    E --> G[Enviar registro profissional CREA ou CFTA]
+    F --> H[Revisar e confirmar]
+    G --> H
+    H --> I[Solicitação pendente]
+    I --> J[Administrador analisa os dados e o documento]
+    J --> K{Decisão}
+    K -->|Aprovar| L[Conta criada e acesso liberado]
+    K -->|Recusar| M[Motivo da recusa disponível no acompanhamento]
+    L --> N[Usuário entra com e-mail e senha]
+    N --> O{Perfil do usuário}
+    O -->|Produtor| P[Dashboard do produtor]
+    O -->|Técnico| Q[Dashboard do técnico]
+```
+
+Durante a análise, o solicitante pode consultar o andamento usando o protocolo
+gerado no envio. A autenticação só é liberada após a aprovação administrativa.
+
+### Entrada de usuários já aprovados
+
+```mermaid
+flowchart LR
+    A[E-mail e senha] --> B[API valida as credenciais]
+    B --> C{Credenciais válidas?}
+    C -->|Não| D[Exibir mensagem de erro]
+    C -->|Sim| E[Gerar JWT com a função do usuário]
+    E --> F[Carregar dados do perfil]
+    F --> G{Função no JWT}
+    G -->|PRODUTOR| H[Área do produtor]
+    G -->|TECNICO_COOPERATIVA| I[Área do técnico]
+    G -->|GESTOR_PUBLICO| J[Área do gestor]
+    G -->|ADMIN| K[Área administrativa]
+```
+
+## Arquitetura
+
+O projeto utiliza uma estrutura de **monorepo** com npm workspaces:
 
 ```text
 chuva-e-safra/
 ├── apps/
-│   ├── web/          # Aplicação web em Next.js
-│   └── backend/      # API Express e configuração do Prisma
-├── package.json      # Comandos e workspaces do projeto
-└── package-lock.json # Versões das dependências
+│   ├── web/          # Interface em Next.js
+│   └── backend/      # API REST em Express
+├── package.json
+└── package-lock.json
 ```
 
-## Pré-requisitos
+O frontend consome a API REST do projeto. O backend centraliza autenticação,
+regras de acesso, consultas agrícolas e persistência dos dados por meio do Prisma.
 
-- Node.js `20.19.x` ou `22.12` (ou superior)
-- npm
-- Acesso ao projeto Supabase usado pela aplicação
+<h2>Tecnologias</h2>
 
-## Instalação
+<kbd>
+  <kbd>Front-end</kbd>
+  <br><br>
+  <p align="center">
+    <img
+      src="https://skillicons.dev/icons?i=nextjs,react,ts,tailwind,radix&perline=5"
+      width="325"
+      alt="Next.js, React, TypeScript, Tailwind CSS e Radix UI"
+    />
+    <br><br>
+    <img src="https://cdn.simpleicons.org/axios/5A29E4" width="48" height="48" alt="Axios" title="Axios" />
+    &nbsp;&nbsp;
+    <img src="https://cdn.simpleicons.org/plotly/3F4F75" width="48" height="48" alt="Plotly.js" title="Plotly.js" />
+  </p>
+</kbd>
 
-Depois de clonar o repositório, entre na **raiz do projeto** e instale as dependências:
+<br><br>
 
-```bash
-cd chuva-e-safra
-npm install
-```
+<kbd>
+  <kbd>Back-end</kbd>
+  <br><br>
+  <p align="center">
+    <img
+      src="https://skillicons.dev/icons?i=nodejs,express,ts,prisma,postgres&perline=5"
+      width="325"
+      alt="Node.js, Express, TypeScript, Prisma e PostgreSQL"
+    />
+    <br><br>
+    <img src="https://cdn.simpleicons.org/zod/3E67B1" width="48" height="48" alt="Zod" title="Zod" />
+    &nbsp;&nbsp;
+    <img src="https://cdn.simpleicons.org/jsonwebtokens/000000" width="48" height="48" alt="JSON Web Token" title="JSON Web Token" />
+  </p>
+</kbd>
 
-> **Importante:** para preparar o projeto pela primeira vez, prefira executar `npm install` na raiz. O npm workspace instalará as dependências do frontend e do backend. Ao adicionar uma biblioteca, instale-a no workspace em que ela será usada para não registrá-la no `package.json` errado.
+<br><br>
 
-### Como adicionar uma nova biblioteca
+<kbd>
+  <kbd>Dados e integrações</kbd>
+  <br><br>
+  <p align="center">
+    <img
+      src="https://skillicons.dev/icons?i=supabase,postgres&perline=2"
+      width="130"
+      alt="Supabase e PostgreSQL"
+    />
+  </p>
+</kbd>
 
-Você pode instalar a biblioteca de duas maneiras.
+## Infraestrutura
 
-Pela raiz, indicando o workspace:
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="https://cdn.simpleicons.org/vercel/000000" alt="Vercel" width="48" height="48" />
+      <br />
+      <strong>Vercel</strong>
+      <br />
+      Frontend Next.js
+    </td>
+    <td align="center" width="33%">
+      <img src="https://cdn.simpleicons.org/render/46E3B7" alt="Render" width="48" height="48" />
+      <br />
+      <strong>Render</strong>
+      <br />
+      API e serviços do backend
+    </td>
+    <td align="center" width="33%">
+      <img src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase" width="48" height="48" />
+      <br />
+      <strong>Supabase</strong>
+      <br />
+      Banco de dados PostgreSQL
+    </td>
+  </tr>
+</table>
 
-```bash
-# Biblioteca usada no frontend
-npm install nome-do-pacote -w web
+## Uso
 
-# Biblioteca usada no backend
-npm install nome-do-pacote -w backend
+Para configurar o ambiente de desenvolvimento, preparar o banco de dados,
+consultar as tabelas e executar os scripts do projeto, acesse o
+[Tutorial de configuração](./TUTORIAL.md).
 
-# Ferramenta usada apenas na raiz do monorepo
-npm install -D nome-do-pacote
-```
+## Equipe
 
-Ou entrando na pasta da aplicação correta:
+<table>
+  <tr>
+    <td align="center" width="16.66%">
+      <img src="https://github.com/Davi-santos16.png?size=180" width="150" height="150" alt="Foto de Davi Castro" />
+      <br />
+      <strong>Davi Castro</strong>
+    </td>
+    <td align="center" width="16.66%">
+      <img src="https://github.com/DanielVerissimo1.png?size=180" width="150" height="150" alt="Foto de Daniel Verissimo" />
+      <br />
+      <strong>Daniel Verissimo</strong>
+    </td>
+    <td align="center" width="16.66%">
+      <img src="https://github.com/anthonyeduardob.png?size=180" width="150" height="150" alt="Foto de Anthony Eduardo" />
+      <br />
+      <strong>Anthony Eduardo</strong>
+    </td>
+    <td align="center" width="16.66%">
+      <img src="./apps/web/public/images/profile/daniel-gomes.png" width="150" height="150" alt="Foto de Daniel Gomes" />
+      <br />
+      <strong>Daniel Gomes</strong>
+    </td>
+    <td align="center" width="16.66%">
+      <img src="./apps/web/public/images/profile/sara.png" width="150" height="150" alt="Foto de Sara" />
+      <br />
+      <strong>Sara</strong>
+    </td>
+    <td align="center" width="16.66%">
+      <img src="https://github.com/Dev-Lucas-Gabriel.png?size=180" width="150" height="150" alt="Foto de Lucas Gabriel" />
+      <br />
+      <strong>Lucas Gabriel</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://br.linkedin.com/in/davigcastro">LinkedIn</a></td>
+    <td align="center"><a href="https://br.linkedin.com/in/daniel-verissimo">LinkedIn</a></td>
+    <td align="center"><a href="https://br.linkedin.com/in/anthony-eduardo-barros">LinkedIn</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/daniel-freitas-5b23b540a/">LinkedIn</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/sara-queiroz-%F0%9F%91%A9%F0%9F%8F%BD%E2%80%8D%F0%9F%92%BB-aa8a40420/">LinkedIn</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/lucas-gabriel-71165332b/">LinkedIn</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/Davi-santos16">GitHub</a></td>
+    <td align="center"><a href="https://github.com/DanielVerissimo1">GitHub</a></td>
+    <td align="center"><a href="https://github.com/anthonyeduardob">GitHub</a></td>
+    <td align="center"><a href="https://github.com/danielfgsdev">GitHub</a></td>
+    <td align="center"><a href="https://github.com/sarinhaqueirozzz">GitHub</a></td>
+    <td align="center"><a href="https://github.com/Dev-Lucas-Gabriel">GitHub</a></td>
+  </tr>
+</table>
 
-```bash
-# Frontend (partindo da raiz)
-cd apps/web
-npm install nome-do-pacote
-cd ../..
+---
 
-# Backend (partindo da raiz)
-cd apps/backend
-npm install nome-do-pacote
-cd ../..
-```
-
-Nos dois casos, a dependência será registrada no `package.json` do workspace escolhido. Evite instalar uma biblioteca do frontend ou do backend diretamente na raiz sem informar `-w`, pois ela seria registrada no projeto principal.
-
-## Configuração do backend
-
-Crie o arquivo `apps/backend/.env` com as conexões fornecidas pelo Supabase:
-
-```env
-DATABASE_URL="postgresql://...URL-do-pooler-do-Supabase..."
-DIRECT_URL="postgresql://...URL-direta-do-Supabase..."
-API_DADOS_URL="https://...URL-da-API-de-dados..."
-JWT_SECRET="...chave-longa-e-aleatoria..."
-JWT_EXPIRES_IN="1d"
-ADMIN_NAME="Administrador"
-ADMIN_EMAIL="admin@example.com"
-ADMIN_PASSWORD="...senha-inicial-com-8-ou-mais-caracteres..."
-```
-
-- `DATABASE_URL` é usada pela aplicação e deve apontar para a conexão com pool do Supabase.
-- `DIRECT_URL` é usada pelos comandos do Prisma e deve apontar para a conexão direta (ou para o Session Pooler) do Supabase.
-- `API_DADOS_URL` é a URL base da API externa de análises.
-- `JWT_SECRET` assina e valida os tokens de autenticação e deve ser mantida em segredo.
-- `JWT_EXPIRES_IN` define a validade do token; quando omitida, a aplicação usa `1d`.
-- `ADMIN_EMAIL` e `ADMIN_PASSWORD` provisionam o primeiro administrador durante a seed. `ADMIN_NAME` é opcional.
-- Não envie o arquivo `.env` para o repositório.
-
-Com as variáveis configuradas, gere o Prisma Client:
-
-```bash
-cd apps/backend
-npx prisma generate
-cd ../..
-```
-
-O comando deve ser executado em `apps/backend`, onde estão `prisma.config.ts` e a pasta `prisma`. Ele gera o código usado pela aplicação, mas não altera o banco de dados.
-
-Para provisionar o primeiro administrador depois de configurar as variáveis acima:
-
-```bash
-cd apps/backend
-npx prisma db seed
-cd ../..
-```
-
-O cadastro público não aceita o perfil `ADMIN`. Depois do primeiro acesso, novos administradores podem ser criados na área protegida `/admin/dashboard`.
-
-### Migrations e banco de produção
-
-O `DIRECT_URL` pode apontar para o banco de produção. Por isso, **não execute `npx prisma migrate dev` usando as credenciais de produção**. Esse comando é destinado somente ao desenvolvimento e deve ser usado com outro projeto Supabase ou com um PostgreSQL local.
-
-Para aplicar migrations já revisadas em produção, use `npx prisma migrate deploy`, preferencialmente pelo processo de deploy/CI. Antes disso, confirme que o histórico de migrations do Prisma está sincronizado com o banco e faça backup dos dados.
-
-Se o banco do Supabase já possuía tabelas antes da adoção do Prisma, não aplique a migration inicial diretamente. Primeiro faça a introspecção do banco e configure um *baseline* das migrations para evitar conflitos ou tentativas de recriar estruturas existentes.
-
-## Executando o projeto
-
-Na raiz do repositório, execute:
-
-```bash
-npm run dev
-```
-
-Esse comando inicia as duas aplicações ao mesmo tempo:
-
-- Frontend: `http://localhost:3000`
-- Backend: `http://localhost:3333`
-
-Também é possível iniciar cada parte separadamente, sempre pela raiz:
-
-```bash
-npm run dev:web
-npm run dev:backend
-```
-
-## Documentação da API
-
-Com o backend em execução, a documentação interativa Swagger fica disponível em:
-
-- Swagger UI: `http://localhost:3333/docs`
-- Especificação OpenAPI em JSON: `http://localhost:3333/docs.json`
-
-Na interface Swagger, cadastre um usuário, faça login, copie o token retornado e
-use o botão **Authorize** para testar a rota protegida de análises. Informe apenas
-o token; o prefixo `Bearer` é adicionado automaticamente.
-
-## Como o projeto funciona
-
-O frontend, localizado em `apps/web`, contém a interface e as rotas do Next.js. O backend, em `apps/backend`, disponibiliza a API e acessa o PostgreSQL por meio do Prisma. Os modelos e migrations do banco ficam em `apps/backend/prisma`.
-
-O backend inicia o servidor Express na porta `3333` e atualmente disponibiliza o cadastro de usuários em `POST /auth/register`.
+<p align="center">
+  Desenvolvido para aproximar tecnologia, dados e agricultura no Ceará.
+</p>
