@@ -41,7 +41,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${sora.variable}`}>
         <ThemeProvider
           attribute='class'
-          defaultTheme='system'
+          defaultTheme='light'
           enableSystem
           disableTransitionOnChange>
           <AuthProvider>{children}</AuthProvider>
